@@ -76,7 +76,7 @@ FORMAT (Use Markdown):
 ### 🧠 Mental State & Suggestion
 (General emotional state of the week and a clear piece of advice/perspective)
 
-The language should be mysterious but very clear and direct.`;
+The language should be mysterious but very clear and direct. **ANSWER IN ENGLISH ONLY.**`;
 
     const prompt = language === "tr" ? promptTr : promptEn;
 

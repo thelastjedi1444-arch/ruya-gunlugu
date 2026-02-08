@@ -352,9 +352,9 @@ function DreamJournalContent() {
               {/* Header */}
               <div className="p-6 border-b border-white/5 shrink-0 flex items-center justify-between bg-[#1a1a1a]">
                 <div>
-                  <h2 className="text-xl font-medium text-white">Haftalık Analiz</h2>
+                  <h2 className="text-xl font-medium text-white">{t("weeklyAnalysis") as string}</h2>
                   <p className="text-sm text-muted/60 mt-1">
-                    {format(weekStart, "d MMM", { locale: tr })} - {format(weekEnd, "d MMM", { locale: tr })}
+                    {format(weekStart, "d MMM", { locale: dateLocale })} - {format(weekEnd, "d MMM", { locale: dateLocale })}
                   </p>
                 </div>
                 <button
@@ -391,7 +391,7 @@ function DreamJournalContent() {
                         {/* Shimmer Effect */}
                         <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
-                        <span className="text-[10px] font-medium text-muted/60 uppercase relative z-10">{format(day, "EEE", { locale: tr })}</span>
+                        <span className="text-[10px] font-medium text-muted/60 uppercase relative z-10">{format(day, "EEE", { locale: dateLocale })}</span>
                         <div className={`w-1.5 h-1.5 rounded-full mt-1 relative z-10 transition-all duration-300 group-hover:scale-125 ${hasDream ? "bg-cyan-400 shadow-[0_0_6px_rgba(34,211,238,0.5)]" : "bg-white/20"}`} />
                       </motion.div>
                     );
@@ -405,7 +405,7 @@ function DreamJournalContent() {
                     <span className="text-4xl font-extralight text-white relative z-10 group-hover:scale-110 transition-transform duration-300">
                       {dreams.filter(d => isWithinInterval(parseISO(d.date), { start: weekStart, end: weekEnd })).length}
                     </span>
-                    <span className="text-[10px] font-semibold text-white/30 uppercase tracking-[0.2em] relative z-10">Rüya Kaydı</span>
+                    <span className="text-[10px] font-semibold text-white/30 uppercase tracking-[0.2em] relative z-10">{t("dreamCountLabel") as string}</span>
                   </div>
                   <div className="relative bg-white/[0.03] border border-white/5 rounded-2xl p-5 flex flex-col items-center justify-center gap-2 group overflow-hidden cursor-default">
                     <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out bg-gradient-to-r from-transparent via-white/10 to-transparent" />
@@ -414,7 +414,7 @@ function DreamJournalContent() {
                         .filter(d => isWithinInterval(parseISO(d.date), { start: weekStart, end: weekEnd }))
                         .reduce((acc, curr) => acc + curr.text.split(" ").length, 0)}
                     </span>
-                    <span className="text-[10px] font-semibold text-white/30 uppercase tracking-[0.2em] relative z-10">Kelime</span>
+                    <span className="text-[10px] font-semibold text-white/30 uppercase tracking-[0.2em] relative z-10">{t("wordCountLabel") as string}</span>
                   </div>
                 </div>
 
@@ -453,10 +453,10 @@ function DreamJournalContent() {
               <div className="px-6 py-4 border-b border-[#262626] flex items-center justify-between shrink-0 bg-[#0f0f0f] rounded-t-2xl">
                 <div>
                   <h2 className="text-xl font-medium text-white">
-                    {format(dayDetail!, "d MMMM yyyy", { locale: tr })}
+                    {format(dayDetail!, "d MMMM yyyy", { locale: dateLocale })}
                   </h2>
                   <p className="text-sm text-muted/50 mt-1">
-                    {format(dayDetail!, "EEEE", { locale: tr })}
+                    {format(dayDetail!, "EEEE", { locale: dateLocale })}
                   </p>
                 </div>
                 <button
@@ -490,7 +490,7 @@ function DreamJournalContent() {
                           <div className="bg-gradient-to-br from-indigo-900/20 to-slate-900/20 border border-indigo-500/10 rounded-lg p-4 mt-4">
                             <div className="flex items-center gap-2 mb-2 text-indigo-300/80 text-sm font-medium uppercase tracking-wider">
                               <span>🌙</span>
-                              <span>Yorum</span>
+                              <span>{t("interpretationLabel") as string}</span>
                             </div>
                             <div className="text-sm text-gray-400 italic leading-relaxed">
                               {dream.interpretation}

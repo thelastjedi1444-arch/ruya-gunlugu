@@ -83,6 +83,9 @@ export const translations = {
         delete: "Sil",
         confirmDelete: "Bu rüyayı silmek istediğinden emin misin?",
         confirmDeleteAction: "Silmeyi onaylıyorsanız tıklayın",
+        dreamCountLabel: "Rüya Kaydı",
+        wordCountLabel: "Kelime",
+        interpretationLabel: "Yorum",
     },
     en: {
         // Page - Main
@@ -166,6 +169,9 @@ export const translations = {
         delete: "Delete",
         confirmDelete: "Are you sure you want to delete this dream?",
         confirmDeleteAction: "Click to confirm deletion",
+        dreamCountLabel: "Dreams",
+        wordCountLabel: "Words",
+        interpretationLabel: "Interpretation",
     },
 } as const;
 
