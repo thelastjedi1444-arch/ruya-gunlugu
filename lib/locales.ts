@@ -98,6 +98,8 @@ export const translations = {
         zodiacSign: "Burç",
         streakDays: "Gün Serisi",
         totalDreamsCount: "Toplam Rüya",
+        zodiacInstruction: "Yıldızların konumunu paylaş; rüyalarının derinliklerindeki mistik kodları burcunla beraber çözelim.",
+        selectZodiacPlaceholder: "Bir burç seçerek rüya yorumunu derinleştir...",
     },
     en: {
         // Page - Main
@@ -196,6 +198,8 @@ export const translations = {
         zodiacSign: "Zodiac Sign",
         streakDays: "Day Streak",
         totalDreamsCount: "Total Dreams",
+        zodiacInstruction: "Share your zodiac sign; let's decode the mystical symbols in your dreams together.",
+        selectZodiacPlaceholder: "Select a zodiac sign to deepen your dream interpretation...",
     },
 } as const;
 
