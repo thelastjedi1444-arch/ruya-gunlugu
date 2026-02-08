@@ -188,6 +188,7 @@ function DreamJournalContent() {
           setInterpretation(found.interpretation);
           setStatus("interpreted");
         } else {
+          setInterpretation("");
           setStatus("saved");
         }
       }

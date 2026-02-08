@@ -7,8 +7,13 @@ import Providers from "@/components/Providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Rüya Günlüğü",
-  description: "Rüyalarını kaydet, kendini keşfet.",
+  title: "iDream",
+  description: "Rüyalarını not al,onlar insanlığın en büyük gizemi.",
+  openGraph: {
+    title: "iDream",
+    description: "Rüyalarını not al,onlar insanlığın en büyük gizemi.",
+    type: "website",
+  },
 };
 
 export const viewport = {
