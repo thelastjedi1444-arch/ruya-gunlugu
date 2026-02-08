@@ -1,7 +1,7 @@
 import { Dream } from "./storage";
 import { startOfWeek, endOfWeek, isWithinInterval, parseISO } from "date-fns";
 
-export async function analyzeWeeklyDreams(dreams: Dream[]): Promise<string> {
+export async function analyzeWeeklyDreams(dreams: Dream[], language: "tr" | "en"): Promise<string> {
     const now = new Date();
     const weekStart = startOfWeek(now, { weekStartsOn: 1 }); // Monday
     const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
@@ -13,24 +13,26 @@ export async function analyzeWeeklyDreams(dreams: Dream[]): Promise<string> {
     });
 
     if (weekDreams.length === 0) {
-        return "Bu hafta henüz rüya kaydedilmemiş. Haftalık analiz yapabilmek için en az bir rüya kaydetmeniz gerekiyor.";
+        return language === "tr"
+            ? "Bu hafta henüz rüya kaydedilmemiş. Haftalık analiz yapabilmek için en az bir rüya kaydetmeniz gerekiyor."
+            : "No dreams recorded this week. You need to record at least one dream to generate a weekly analysis.";
     }
 
     // Prepare context for AI
     const dreamTexts = weekDreams.map((d, i) => {
-        const date = new Date(d.date).toLocaleDateString("tr-TR", {
+        const date = new Date(d.date).toLocaleDateString(language === "tr" ? "tr-TR" : "en-US", {
             weekday: 'long',
             year: 'numeric',
             month: 'long',
             day: 'numeric'
         });
-        return `**Rüya ${i + 1}** (${date})
-**Başlık:** ${d.title || 'Adsız'}
-**Rüya:** ${d.text}
-${d.interpretation ? `**Mevcut Analiz:** ${d.interpretation}` : ""}`;
+        return `**${language === "tr" ? "Rüya" : "Dream"} ${i + 1}** (${date})
+**${language === "tr" ? "Başlık" : "Title"}:** ${d.title || (language === "tr" ? 'Adsız' : 'Untitled')}
+**${language === "tr" ? "Rüya" : "Dream Content"}:** ${d.text}
+${d.interpretation ? `**${language === "tr" ? "Mevcut Analiz" : "Current Interpretation"}:** ${d.interpretation}` : ""}`;
     }).join("\n\n---\n\n");
 
-    const prompt = `Aşağıda bir kullanıcının bu hafta gördüğü rüyalar listelenmiştir. Bu rüyaları toplu bir şekilde, bütüncül bir bakış açısıyla analiz et.
+    const promptTr = `Aşağıda bir kullanıcının bu hafta gördüğü rüyalar listelenmiştir. Bu rüyaları toplu bir şekilde, bütüncül bir bakış açısıyla analiz et.
 
 ${dreamTexts}
 
@@ -53,6 +55,31 @@ FORMAT (Markdown kullan):
 
 Dili gizemli ama çok net ve doğrudan olsun.`;
 
+    const promptEn = `Below are the dreams recorded by a user this week. Analyze these dreams collectively from a holistic perspective.
+
+${dreamTexts}
+
+CRITICAL INSTRUCTIONS (PLEASE FOLLOW EXACTLY):
+1. **NO INTRODUCTIONS**: Do not say "Hello", "Here is your analysis", "Your dreams show". Start directly with the analysis.
+2. **NO DISCLAIMERS**: Do not add warnings like "This is just an interpretation", "Consult a professional".
+3. **DO NOT SUMMARIZE INDIVIDUALLY**: Do not go through dreams day by day. Treat the whole week as a single narrative or mental process.
+4. **BE CLEAR AND DIRECT**: Avoid vague phrases like "It implies", "It might be". State your observations clearly.
+5. **BE CONCISE**: Avoid unnecessary wordiness.
+
+FORMAT (Use Markdown):
+### 🌊 Spirit of the Week
+(A very clear 2-3 sentence summary explaining the main theme and mental flow of the week)
+
+### 🗝️ Key Symbols
+(The most important 2-3 symbols standing out this week and their specific meaning)
+
+### 🧠 Mental State & Suggestion
+(General emotional state of the week and a clear piece of advice/perspective)
+
+The language should be mysterious but very clear and direct.`;
+
+    const prompt = language === "tr" ? promptTr : promptEn;
+
     try {
         const response = await fetch("/api/chat", {
             method: "POST",
@@ -70,6 +97,8 @@ Dili gizemli ama çok net ve doğrudan olsun.`;
         return data.response || "Analiz oluşturulamadı.";
     } catch (error) {
         console.error("Weekly analysis error:", error);
-        return "Haftalık analiz oluşturulurken bir hata oluştu. Lütfen daha sonra tekrar deneyin.";
+        return language === "tr"
+            ? "Haftalık analiz oluşturulurken bir hata oluştu. Lütfen daha sonra tekrar deneyin."
+            : "An error occurred while generating the weekly analysis. Please try again later.";
     }
 }

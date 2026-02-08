@@ -22,9 +22,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { playHoverSound } from "@/lib/sound";
 import { useLanguage } from "@/hooks/use-language";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function CalendarPage() {
     const router = useRouter();
+    const { user } = useAuth();
     const { language, t } = useLanguage();
     const dateLocale = language === "tr" ? tr : enUS;
     const weekDays = t("weekDays") as readonly string[];
@@ -34,11 +36,11 @@ export default function CalendarPage() {
     const [dayDetail, setDayDetail] = useState<Date | null>(null);
 
     useEffect(() => {
-        setDreams(getDreams());
-        const handleUpdate = () => setDreams(getDreams());
+        setDreams(getDreams(user?.id));
+        const handleUpdate = () => setDreams(getDreams(user?.id));
         window.addEventListener("dream-saved", handleUpdate);
         return () => window.removeEventListener("dream-saved", handleUpdate);
-    }, []);
+    }, [user]);
 
     // Calendar Generation Logic
     const monthStart = startOfMonth(currentMonth);

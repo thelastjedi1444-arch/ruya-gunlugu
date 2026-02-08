@@ -23,7 +23,7 @@ export default function LanguageToggle() {
                 {language === "tr" && (
                     <motion.div
                         layoutId="language-active"
-                        className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full shadow-[0_0_15px_rgba(79,70,229,0.4)]"
+                        className="absolute inset-0 bg-red-600 rounded-full shadow-[0_0_15px_rgba(220,38,38,0.5)]"
                         transition={{ type: "spring", stiffness: 400, damping: 30 }}
                     />
                 )}
@@ -32,7 +32,7 @@ export default function LanguageToggle() {
                 {hovered === "tr" && language !== "tr" && (
                     <motion.div
                         layoutId="language-hover"
-                        className="absolute inset-0 bg-blue-500/20 rounded-full blur-sm"
+                        className="absolute inset-0 bg-red-500/20 rounded-full blur-sm"
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
@@ -56,7 +56,7 @@ export default function LanguageToggle() {
                 {language === "en" && (
                     <motion.div
                         layoutId="language-active"
-                        className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full shadow-[0_0_15px_rgba(79,70,229,0.4)]"
+                        className="absolute inset-0 bg-blue-600 rounded-full shadow-[0_0_15px_rgba(37,99,235,0.5)]"
                         transition={{ type: "spring", stiffness: 400, damping: 30 }}
                     />
                 )}

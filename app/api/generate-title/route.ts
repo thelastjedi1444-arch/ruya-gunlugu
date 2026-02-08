@@ -10,7 +10,7 @@ export async function POST(req: Request) {
         );
     }
 
-    const { text } = await req.json();
+    const { text, language } = await req.json();
     if (!text) {
         return NextResponse.json(
             { error: "Dream text is required" },
@@ -18,8 +18,13 @@ export async function POST(req: Request) {
         );
     }
 
+    const lang = language || 'tr';
+    const langName = lang === 'en' ? 'English' : 'Turkish';
+
+
     const prompt = `
-      You are a dream title generator. Create a SHORT, poetic title (max 4-6 words) in Turkish for this dream.
+      You are a dream title generator. Create a SHORT, poetic title (max 4-6 words) in ${langName} for this dream.
+
       Rules:
       - First letter of each major word should be capitalized
       - Be creative but concise

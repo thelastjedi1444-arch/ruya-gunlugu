@@ -133,9 +133,8 @@ function DreamJournalContent() {
 
   // Load dreams
   const loadDreams = () => {
-    // In a real app we'd filter by user.id, but for local storage demo we show all local dreams
-    // Ideally, we might want to only show the user's dreams if logged in, but let's keep it simple
-    setDreams(getDreams());
+    // Filter by current user ID if logged in, or show guest dreams if not
+    setDreams(getDreams(user?.id));
   };
 
   useEffect(() => {
@@ -170,12 +169,12 @@ function DreamJournalContent() {
     loadDreams();
     const handleStorageUpdate = () => loadDreams();
     window.addEventListener("dream-saved", handleStorageUpdate);
-    window.addEventListener("auth-change", handleStorageUpdate);
+    // window.addEventListener("auth-change", handleStorageUpdate); // No longer needed as we depend on [user]
     return () => {
       window.removeEventListener("dream-saved", handleStorageUpdate);
-      window.removeEventListener("auth-change", handleStorageUpdate);
+      // window.removeEventListener("auth-change", handleStorageUpdate);
     };
-  }, []);
+  }, [user]); // Re-run when user changes (login/logout)
 
   // Load dream if ID is present
   useEffect(() => {
@@ -220,9 +219,12 @@ function DreamJournalContent() {
       setStatus("idle");
 
       setStatus("saving");
+      // Removed artificial delay
+      // await new Promise(resolve => setTimeout(resolve, 600));
+
       await new Promise(resolve => setTimeout(resolve, 600));
 
-      const newDream = await saveDream(text, user?.id, user?.username);
+      const newDream = await saveDream(text, user?.id, user?.username, language);
 
       // Navigate to the new dream's ID
       handleSelectDream(newDream.id);
@@ -247,7 +249,10 @@ function DreamJournalContent() {
     // Remove artificial delay to fix "lag"/double-glitch feel
     // await new Promise(resolve => setTimeout(resolve, 600));
 
-    const newDream = await saveDream(currentText, user?.id, user?.username);
+    // await new Promise(resolve => setTimeout(resolve, 600));
+
+    const newDream = await saveDream(currentText, user?.id, user?.username, language);
+
 
     // Navigate to the new dream's ID to prevent useEffect from resetting the state
     handleSelectDream(newDream.id);
@@ -307,7 +312,7 @@ function DreamJournalContent() {
     try {
       // Filter dreams for weekly analysis - maybe only user's if logged in?
       // For now, let's keep analyzing all visible dreams
-      const analysis = await analyzeWeeklyDreams(dreams);
+      const analysis = await analyzeWeeklyDreams(dreams, language);
       setWeeklyAnalysisText(analysis);
     } catch (error) {
       console.error("Weekly analysis error:", error);

@@ -68,13 +68,13 @@ export const loginUser = (username: string): User | null => {
 };
 
 // Dream Management
-export const saveDream = async (text: string, userId?: string, username?: string): Promise<Dream> => {
+export const saveDream = async (text: string, userId?: string, username?: string, language: "tr" | "en" = "tr"): Promise<Dream> => {
     const dreams = getDreams();
     const newDream: Dream = {
         id: generateId(),
         text,
         date: new Date().toISOString(),
-        userId,
+        userId: userId || undefined, // Ensure undefined if null/empty
         username,
     };
 
@@ -90,7 +90,7 @@ export const saveDream = async (text: string, userId?: string, username?: string
         const titleRes = await fetch("/api/generate-title", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text }),
+            body: JSON.stringify({ text, language }),
         });
         const titleData = await titleRes.json();
         if (titleData.title) {
@@ -106,14 +106,22 @@ export const saveDream = async (text: string, userId?: string, username?: string
     return newDream;
 };
 
-export const getDreams = (): Dream[] => {
+export const getDreams = (userId?: string | null): Dream[] => {
     if (typeof window === "undefined") return [];
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
+    const allDreams: Dream[] = stored ? JSON.parse(stored) : [];
+
+    if (userId) {
+        return allDreams.filter(d => d.userId === userId);
+    }
+    return allDreams.filter(d => !d.userId);
 };
 
 export const updateDream = (id: string, updates: Partial<Dream>) => {
-    const dreams = getDreams();
+    // We get ALL dreams because we need to write back the full list
+    if (typeof window === "undefined") return;
+    const stored = localStorage.getItem(STORAGE_KEY);
+    const dreams: Dream[] = stored ? JSON.parse(stored) : [];
     const updatedDreams = dreams.map((d) =>
         d.id === id ? { ...d, ...updates } : d
     );
@@ -121,7 +129,9 @@ export const updateDream = (id: string, updates: Partial<Dream>) => {
 };
 
 export const deleteDream = (id: string) => {
-    const dreams = getDreams();
+    if (typeof window === "undefined") return;
+    const stored = localStorage.getItem(STORAGE_KEY);
+    const dreams: Dream[] = stored ? JSON.parse(stored) : [];
     const filteredDreams = dreams.filter((d) => d.id !== id);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(filteredDreams));
     if (typeof window !== "undefined") {
@@ -129,8 +139,8 @@ export const deleteDream = (id: string) => {
     }
 };
 
-export const getStorageStats = () => {
-    const dreams = getDreams();
+export const getStorageStats = (userId?: string | null) => {
+    const dreams = getDreams(userId);
     const users = getUsers();
     const feedbacks = getFeedbacks();
     const now = new Date();

@@ -43,9 +43,9 @@ export default function Sidebar({ isOpen, dreams, onSelectDream, onDeleteDream, 
     useEffect(() => {
         const handleOutsideClick = () => setOpenMenuId(null);
         if (openMenuId) {
-            window.addEventListener('click', handleOutsideClick);
+            window.addEventListener('mousedown', handleOutsideClick);
         }
-        return () => window.removeEventListener('click', handleOutsideClick);
+        return () => window.removeEventListener('mousedown', handleOutsideClick);
     }, [openMenuId]);
 
     // Mini Calendar Logic
