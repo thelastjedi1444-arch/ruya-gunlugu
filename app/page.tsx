@@ -204,12 +204,22 @@ function DreamJournalContent() {
       setActiveDreamText("");
       setDreamId(null);
       setStatus("idle");
-      setTimeout(() => {
-        const textarea = document.querySelector('textarea');
-        if (textarea) textarea.style.height = 'auto';
-      }, 0);
     }
   }, [id, dreams, status]);
+
+  // Auto-scroll to bottom when status becomes "saved" to reveal the Interpret button
+  useEffect(() => {
+    if (status === "saved" && scrollRef.current) {
+      setTimeout(() => {
+        if (scrollRef.current) {
+          scrollRef.current.scrollTo({
+            top: scrollRef.current.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
+      }, 300);
+    }
+  }, [status]);
 
 
 
@@ -602,7 +612,7 @@ function DreamJournalContent() {
         />
 
         <div style={{ height: viewportHeight }} className="flex-1 flex flex-col w-full md:ml-80 transition-all duration-300 overflow-hidden">
-          <div ref={scrollRef} className="flex-1 w-full flex flex-col px-4 md:px-8 space-y-6 pb-36 pt-32 md:pt-20 overflow-y-auto custom-scrollbar max-w-3xl mx-auto scroll-m-20">
+          <div ref={scrollRef} className="flex-1 w-full flex flex-col px-4 md:px-8 space-y-6 pb-48 pt-32 md:pt-20 overflow-y-auto custom-scrollbar max-w-3xl mx-auto scroll-m-20">
             <div className="flex-1 min-h-[20vh]" />
             <AnimatePresence mode="popLayout">
               {activeDreamText && (
