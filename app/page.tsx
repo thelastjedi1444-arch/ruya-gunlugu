@@ -8,6 +8,7 @@ import { analyzeWeeklyDreams } from "@/lib/weekly-analysis";
 import { format, parseISO, isSameDay, startOfWeek, endOfWeek, eachDayOfInterval, isToday, isWithinInterval } from "date-fns";
 import { tr, enUS } from "date-fns/locale";
 import FadeInText from "@/components/Typewriter";
+import SmoothScrollText from "@/components/SmoothScrollText";
 import Sidebar from "@/components/Sidebar";
 import AuthModal from "@/components/AuthModal";
 import ReactMarkdown from "react-markdown";
@@ -206,12 +207,7 @@ function DreamJournalContent() {
     }
   }, [id, dreams, status]);
 
-  // Auto-scroll to bottom when content changes
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [activeDreamText, interpretation, status]);
+
 
   const handleSave = async () => {
     if (!dream.trim()) return;
@@ -649,7 +645,10 @@ function DreamJournalContent() {
                       <span className="text-xs font-semibold text-indigo-300 tracking-widest uppercase ml-1">{t("interpretation") as string}</span>
                       <div className="bg-[#1a1a1a]/80 border border-white/5 px-5 py-4 md:px-6 md:py-5 rounded-2xl rounded-tl-sm shadow-xl backdrop-blur-md overflow-hidden break-words">
                         <div className="prose prose-invert prose-base md:prose-lg max-w-none text-gray-300 font-light leading-7 md:leading-8 whitespace-pre-wrap break-words">
-                          <FadeInText text={interpretation} />
+                          <SmoothScrollText
+                            text={interpretation}
+                            scrollContainerRef={scrollRef as React.RefObject<HTMLElement>}
+                          />
                         </div>
                       </div>
                     </div>
