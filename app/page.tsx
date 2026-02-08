@@ -709,7 +709,7 @@ function DreamJournalContent() {
                   key="action-reset"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="w-full flex justify-center py-12 pb-32"
+                  className="w-full flex justify-center py-8 pb-12"
                 >
                   <div className="flex items-center gap-3 text-white/30 text-[10px] md:text-xs font-semibold uppercase tracking-[0.3em]">
                     <span>{t("noteSaved") as string}</span>

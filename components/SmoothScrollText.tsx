@@ -13,17 +13,22 @@ interface SmoothScrollTextProps {
 export default function SmoothScrollText({
     text,
     onComplete,
-    speed = 20,
+    speed = 30, // Slightly faster default speed for words
     scrollContainerRef
 }: SmoothScrollTextProps) {
-    const [displayedText, setDisplayedText] = useState("");
+    const [displayedWords, setDisplayedWords] = useState<string[]>([]);
     const [isComplete, setIsComplete] = useState(false);
     const [userHasScrolled, setUserHasScrolled] = useState(false);
     const lastScrollTop = useRef(0);
     const isAutoScrolling = useRef(false);
+    const wordsRef = useRef<string[]>([]);
 
-    // Split text into paragraphs for cleaner rendering
-    const paragraphs = text.split('\n').filter(p => p.trim());
+    // Prepare words on text change
+    useEffect(() => {
+        wordsRef.current = text.split(" ");
+        setDisplayedWords([]);
+        setIsComplete(false);
+    }, [text]);
 
     // Scroll Detection Logic
     useEffect(() => {
@@ -39,11 +44,11 @@ export default function SmoothScrollText({
             }
 
             // Detect manual scroll up
-            if (container.scrollTop < lastScrollTop.current - 5) {
+            if (container.scrollTop < lastScrollTop.current - 10) {
                 setUserHasScrolled(true);
             }
 
-            // Use tolerance for "bottom" detection to resume auto-scroll
+            // Resume auto-scroll if user manually scrolls back to bottom
             const isAtBottom =
                 Math.abs(container.scrollHeight - container.scrollTop - container.clientHeight) < 50;
 
@@ -58,16 +63,14 @@ export default function SmoothScrollText({
         return () => container.removeEventListener('scroll', handleScroll);
     }, [scrollContainerRef]);
 
-
-    // Typing Effect
+    // Word Streaming Effect
     useEffect(() => {
-        let currentIndex = 0;
-        setIsComplete(false);
-        setDisplayedText("");
+        if (!wordsRef.current.length) return;
 
+        let currentIndex = 0;
         const interval = setInterval(() => {
-            if (currentIndex < text.length) {
-                setDisplayedText((prev) => prev + text[currentIndex]);
+            if (currentIndex < wordsRef.current.length) {
+                setDisplayedWords((prev) => [...prev, wordsRef.current[currentIndex]]);
                 currentIndex++;
             } else {
                 clearInterval(interval);
@@ -79,41 +82,49 @@ export default function SmoothScrollText({
         return () => clearInterval(interval);
     }, [text, speed, onComplete]);
 
-
-    // Auto-Scroll Logic
+    // Smart Auto-Scroll Logic
     useEffect(() => {
         if (userHasScrolled || !scrollContainerRef.current) return;
 
         const container = scrollContainerRef.current;
+        const threshold = 100; // Only scroll if content is near the bottom edge
+        const distanceToBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+
+        if (distanceToBottom > threshold && !isAutoScrolling.current) {
+            // Don't scroll if we are far up (unless it's the very start)
+            // But here we rely on userHasScrolled flag mostly.
+        }
+
+        // Always scroll to bottom if allowed
         const targetScroll = container.scrollHeight;
 
-        // Use requestAnimationFrame for smoother scrolling
-        const smoothScroll = () => {
-            if (userHasScrolled) return;
+        isAutoScrolling.current = true;
+        container.scrollTo({
+            top: targetScroll,
+            behavior: 'smooth'
+        });
 
-            isAutoScrolling.current = true;
-            container.scrollTo({
-                top: targetScroll,
-                behavior: 'smooth'
-            });
-        };
+    }, [displayedWords, userHasScrolled, scrollContainerRef]);
 
-        smoothScroll();
-
-    }, [displayedText, userHasScrolled, scrollContainerRef]);
+    // Reconstruct paragraphs from words for display
+    const textContent = displayedWords.join(" ");
+    const paragraphs = textContent.split("\n");
 
     return (
         <div className="space-y-4">
-            {displayedText.split('\n').map((paragraph, index) => (
-                <motion.p
-                    key={index}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
-                    className="leading-relaxed"
-                >
-                    {paragraph}
-                </motion.p>
+            {paragraphs.map((paragraph, pIndex) => (
+                <p key={pIndex} className="leading-relaxed">
+                    {paragraph.split(" ").map((word, wIndex) => (
+                        <motion.span
+                            key={`${pIndex}-${wIndex}`}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            {word}{" "}
+                        </motion.span>
+                    ))}
+                </p>
             ))}
         </div>
     );
