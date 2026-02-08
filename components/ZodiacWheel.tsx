@@ -2,20 +2,26 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 
-export const zodiacSigns = [
-    { name: "Koç", symbol: "♈", element: "Ateş", traits: "Cesur, öncü, enerjik", description: "Rüyalarınız aksiyon doludur; bilinçaltınız size harekete geçmeniz gereken alanları fısıldar." },
-    { name: "Boğa", symbol: "♉", element: "Toprak", traits: "Güvenilir, sabırlı, pratik", description: "Rüyalarınız duyusal ve nettir; doğa ve huzur temalarıyla geleceğe dair sağlam ipuçları verir." },
-    { name: "İkizler", symbol: "♊", element: "Hava", traits: "Meraklı, uyumlu, zeki", description: "Rüyalarınız bol diyalog ve bilgi içerir; zihdiniz uyurken bile çözümler üretmeye devam eder." },
-    { name: "Yengeç", symbol: "♋", element: "Su", traits: "Sezgisel, duygusal, koruyucu", description: "Rüyalarınız geçmiş ve anılarla doludur; duygusal derinliklerinizde saklı mesajları gün yüzüne çıkarır." },
-    { name: "Aslan", symbol: "♌", element: "Ateş", traits: "Yaratıcı, tutkulu, cömert", description: "Rüyalarınız parlak ve sahne ışıklarıyla doludur; içsel gücünüzü ve liderlik potansiyelinizi yansıtır." },
-    { name: "Başak", symbol: "♍", element: "Toprak", traits: "Analitik, çalışkan, pratik", description: "Rüyalarınız detaycı ve düzenleyicidir; hayatınızdaki karmaşayı çözmeniz için size rehberlik eder." },
-    { name: "Terazi", symbol: "♎", element: "Hava", traits: "Diplomatik, zarif, adil", description: "Rüyalarınız estetik ve denge arayışındadır; ilişkilerinizdeki uyumu veya çatışmayı size aynalar." },
-    { name: "Akrep", symbol: "♏", element: "Su", traits: "Tutkulu, inatçı, becerikli", description: "Gizemli ve yoğun rüyalarınızla bilinçaltınızın en derin sırlarını keşfederiniz; dönüşüm kaçınılmazdır." },
-    { name: "Yay", symbol: "♐", element: "Ateş", traits: "Cömert, idealist, esprili", description: "Rüyalarınız keşif ve macera doludur; size yeni ufuklar ve felsefi bakış açıları sunar." },
-    { name: "Oğlak", symbol: "♑", element: "Toprak", traits: "Sorumlu, disiplinli, yönetici", description: "Rüyalarınız hedefler ve yapılarla ilgilidir; size başarıya giden yolda disiplinli mesajlar verir." },
-    { name: "Kova", symbol: "♒", element: "Hava", traits: "İlerici, orijinal, bağımsız", description: "Rüyalarınız sıra dışı ve futuristiktir; toplumsal olaylara veya geleceğe dair vizyonlar sunabilir." },
-    { name: "Balık", symbol: "♓", element: "Su", traits: "Sanatsal, sezgisel, nazik", description: "Rüyalarınız okyanus kadar derin ve semboliktir; evrensel bilinçle bağlantı kurmanızı sağlar." },
-];
+export const zodiacSignKeys = [
+    "aries", "taurus", "gemini", "cancer", "leo", "virgo",
+    "libra", "scorpio", "sagittarius", "capricorn", "aquarius", "pisces"
+] as const;
+
+export const zodiacSymbols: Record<string, string> = {
+    aries: "♈",
+    taurus: "♉",
+    gemini: "♊",
+    cancer: "♋",
+    leo: "♌",
+    virgo: "♍",
+    libra: "♎",
+    scorpio: "♏",
+    sagittarius: "♐",
+    capricorn: "♑",
+    aquarius: "♒",
+    pisces: "♓",
+};
+
 
 interface ZodiacWheelProps {
     onSelect: (sign: string) => void;
@@ -24,7 +30,8 @@ interface ZodiacWheelProps {
 }
 
 export default function ZodiacWheel({ onSelect, selectedSign, t = (key) => key }: ZodiacWheelProps) {
-    const currentSign = zodiacSigns.find(s => s.name === selectedSign);
+    const localizedZodiacSigns = t("zodiacSigns") as any;
+    const currentSignData = selectedSign ? localizedZodiacSigns[selectedSign] : undefined;
 
     return (
         <div className="w-full space-y-6">
@@ -37,13 +44,14 @@ export default function ZodiacWheel({ onSelect, selectedSign, t = (key) => key }
 
             {/* Grid Selection */}
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 md:gap-3">
-                {zodiacSigns.map((sign) => {
-                    const isSelected = selectedSign === sign.name;
+                {zodiacSignKeys.map((signKey) => {
+                    const sign = localizedZodiacSigns[signKey];
+                    const isSelected = selectedSign === signKey;
                     return (
                         <motion.button
-                            key={sign.name}
+                            key={signKey}
                             type="button"
-                            onClick={() => onSelect(sign.name)}
+                            onClick={() => onSelect(signKey)}
                             whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.05)" }}
                             whileTap={{ scale: 0.95 }}
                             className={`
@@ -62,7 +70,7 @@ export default function ZodiacWheel({ onSelect, selectedSign, t = (key) => key }
                                     filter: "brightness(1.5)"
                                 }}
                             >
-                                {sign.symbol}
+                                {zodiacSymbols[signKey]}
                             </span>
                             <span className={`text-[9px] md:text-[10px] font-bold tracking-widest uppercase text-center ${isSelected ? "text-blue-400" : "text-white/40"}`}>
                                 {sign.name}
@@ -81,38 +89,43 @@ export default function ZodiacWheel({ onSelect, selectedSign, t = (key) => key }
 
             {/* Dynamic Description Box */}
             <AnimatePresence mode="wait">
-                {currentSign ? (
-                    <motion.div
-                        key={currentSign.name}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="p-4 md:p-5 rounded-2xl bg-blue-500/5 border border-blue-500/20 backdrop-blur-sm"
-                    >
-                        <div className="flex items-center gap-3 mb-2">
-                            <span
-                                className="text-2xl md:text-3xl text-blue-400"
-                                style={{
-                                    textShadow: "0 0 8px #60a5fa", // Changed to create a glow effect
-                                    // Removed color: "transparent" to make the text visible
-                                }}
-                            >
-                                {currentSign.symbol}
-                            </span>
-                            <div>
-                                <h4 className="text-sm md:text-base font-semibold text-blue-400">
-                                    {currentSign.name} <span className="text-white/30 text-xs font-normal ml-2">({currentSign.element})</span>
-                                </h4>
-                                <p className="text-[9px] md:text-[10px] text-blue-400/60 font-medium tracking-widest uppercase">
-                                    {currentSign.traits}
-                                </p>
+                {selectedSign ? (() => {
+                    // Assuming selectedSign is the key (e.g., "aries")
+                    const currentSign = localizedZodiacSigns[selectedSign];
+
+                    return currentSign ? (
+                        <motion.div
+                            key={selectedSign}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            className="p-4 md:p-5 rounded-2xl bg-blue-500/5 border border-blue-500/20 backdrop-blur-sm"
+                        >
+                            <div className="flex items-center gap-3 mb-2">
+                                <span
+                                    className="text-2xl md:text-3xl text-blue-400"
+                                    style={{
+                                        textShadow: "0 0 8px #60a5fa", // Changed to create a glow effect
+                                        // Removed color: "transparent" to make the text visible
+                                    }}
+                                >
+                                    {zodiacSymbols[selectedSign]}
+                                </span>
+                                <div>
+                                    <h4 className="text-sm md:text-base font-semibold text-blue-400">
+                                        {currentSign.name} <span className="text-white/30 text-xs font-normal ml-2">({currentSign.element})</span>
+                                    </h4>
+                                    <p className="text-[9px] md:text-[10px] text-blue-400/60 font-medium tracking-widest uppercase">
+                                        {currentSign.traits}
+                                    </p>
+                                </div>
                             </div>
-                        </div>
-                        <p className="text-xs md:text-sm text-white/70 leading-relaxed font-light mt-2 border-t border-white/5 pt-3">
-                            "{currentSign.description}"
-                        </p>
-                    </motion.div>
-                ) : (
+                            <p className="text-xs md:text-sm text-white/70 leading-relaxed font-light mt-2 border-t border-white/5 pt-3">
+                                "{currentSign.description}"
+                            </p>
+                        </motion.div>
+                    ) : null;
+                })() : (
                     <div className="h-20 md:h-24 flex items-center justify-center rounded-2xl border border-dashed border-white/5 text-white/20 text-xs md:text-sm">
                         {t("selectZodiacPlaceholder") || "Bir burç seçerek rüya yorumunu derinleştir..."}
                     </div>
@@ -121,3 +134,4 @@ export default function ZodiacWheel({ onSelect, selectedSign, t = (key) => key }
         </div>
     );
 }
+

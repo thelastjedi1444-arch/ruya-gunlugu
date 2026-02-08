@@ -100,6 +100,20 @@ export const translations = {
         totalDreamsCount: "Toplam Rüya",
         zodiacInstruction: "Yıldızların konumunu paylaş; rüyalarının derinliklerindeki mistik kodları burcunla beraber çözelim.",
         selectZodiacPlaceholder: "Bir burç seçerek rüya yorumunu derinleştir...",
+        zodiacSigns: {
+            aries: { name: "Koç", element: "Ateş", traits: "Cesur, öncü, enerjik", description: "Rüyalarınız aksiyon doludur; bilinçaltınız size harekete geçmeniz gereken alanları fısıldar." },
+            taurus: { name: "Boğa", element: "Toprak", traits: "Güvenilir, sabırlı, pratik", description: "Rüyalarınız duyusal ve nettir; doğa ve huzur temalarıyla geleceğe dair sağlam ipuçları verir." },
+            gemini: { name: "İkizler", element: "Hava", traits: "Meraklı, uyumlu, zeki", description: "Rüyalarınız bol diyalog ve bilgi içerir; zihdiniz uyurken bile çözümler üretmeye devam eder." },
+            cancer: { name: "Yengeç", element: "Su", traits: "Sezgisel, duygusal, koruyucu", description: "Rüyalarınız geçmiş ve anılarla doludur; duygusal derinliklerinizde saklı mesajları gün yüzüne çıkarır." },
+            leo: { name: "Aslan", element: "Ateş", traits: "Yaratıcı, tutkulu, cömert", description: "Rüyalarınız parlak ve sahne ışıklarıyla doludur; içsel gücünüzü ve liderlik potansiyelinizi yansıtır." },
+            virgo: { name: "Başak", element: "Toprak", traits: "Analitik, çalışkan, pratik", description: "Rüyalarınız detaycı ve düzenleyicidir; hayatınızdaki karmaşayı çözmeniz için size rehberlik eder." },
+            libra: { name: "Terazi", element: "Hava", traits: "Diplomatik, zarif, adil", description: "Rüyalarınız estetik ve denge arayışındadır; ilişkilerinizdeki uyumu veya çatışmayı size aynalar." },
+            scorpio: { name: "Akrep", element: "Su", traits: "Tutkulu, inatçı, becerikli", description: "Gizemli ve yoğun rüyalarınızla bilinçaltınızın en derin sırlarını keşfederiniz; dönüşüm kaçınılmazdır." },
+            sagittarius: { name: "Yay", element: "Ateş", traits: "Cömert, idealist, esprili", description: "Rüyalarınız keşif ve macera doludur; size yeni ufuklar ve felsefi bakış açıları sunar." },
+            capricorn: { name: "Oğlak", element: "Toprak", traits: "Sorumlu, disiplinli, yönetici", description: "Rüyalarınız hedefler ve yapılarla ilgilidir; size başarıya giden yolda disiplinli mesajlar verir." },
+            aquarius: { name: "Kova", element: "Hava", traits: "İlerici, orijinal, bağımsız", description: "Rüyalarınız sıra dışı ve futuristiktir; toplumsal olaylara veya geleceğe dair vizyonlar sunabilir." },
+            pisces: { name: "Balık", element: "Su", traits: "Sanatsal, sezgisel, nazik", description: "Rüyalarınız okyanus kadar derin ve semboliktir; evrensel bilinçle bağlantı kurmanızı sağlar." },
+        },
     },
     en: {
         // Page - Main
@@ -200,11 +214,25 @@ export const translations = {
         totalDreamsCount: "Total Dreams",
         zodiacInstruction: "Share your zodiac sign; let's decode the mystical symbols in your dreams together.",
         selectZodiacPlaceholder: "Select a zodiac sign to deepen your dream interpretation...",
+        zodiacSigns: {
+            aries: { name: "Aries", element: "Fire", traits: "Brave, pioneering, energetic", description: "Your dreams are action-packed; your subconscious whispers areas requiring movement." },
+            taurus: { name: "Taurus", element: "Earth", traits: "Reliable, patient, practical", description: "Your dreams are sensory and clear; themes of nature and peace offer solid clues about the future." },
+            gemini: { name: "Gemini", element: "Air", traits: "Curious, adaptable, intelligent", description: "Your dreams contain abundant dialogue and information; your mind continues solving even while you sleep." },
+            cancer: { name: "Cancer", element: "Water", traits: "Intuitive, emotional, protective", description: "Your dreams are filled with the past and memories; they bring hidden messages from your emotional depths." },
+            leo: { name: "Leo", element: "Fire", traits: "Creative, passionate, generous", description: "Your dreams are bright and filled with stage lights; they reflect your inner strength and leadership potential." },
+            virgo: { name: "Virgo", element: "Earth", traits: "Analytical, hardworking, practical", description: "Your dreams are detail-oriented and organizing; they guide you to unravel complexity in your life." },
+            libra: { name: "Libra", element: "Air", traits: "Diplomatic, graceful, fair", description: "Your dreams seek aesthetics and balance; they mirror harmony or conflict in your relationships." },
+            scorpio: { name: "Scorpio", element: "Water", traits: "Passionate, determined, resourceful", description: "With mysterious and intense dreams, you explore your subconscious's deepest secrets; transformation is inevitable." },
+            sagittarius: { name: "Sagittarius", element: "Fire", traits: "Generous, idealistic, humorous", description: "Your dreams are full of exploration and adventure; they offer new horizons and philosophical perspectives." },
+            capricorn: { name: "Capricorn", element: "Earth", traits: "Responsible, disciplined, managerial", description: "Your dreams are about goals and structures; they deliver disciplined messages on the path to success." },
+            aquarius: { name: "Aquarius", element: "Air", traits: "Progressive, original, independent", description: "Your dreams are unconventional and futuristic; they may present visions about social events or the future." },
+            pisces: { name: "Pisces", element: "Water", traits: "Artistic, intuitive, gentle", description: "Your dreams are as deep and symbolic as the ocean; they enable you to connect with universal consciousness." },
+        },
     },
 } as const;
 
 export type TranslationKey = keyof typeof translations.tr;
 
-export function getTranslation(language: Language, key: TranslationKey): string | readonly string[] {
+export function getTranslation(language: Language, key: TranslationKey): any {
     return translations[language][key];
 }

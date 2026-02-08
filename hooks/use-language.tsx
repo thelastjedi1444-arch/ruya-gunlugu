@@ -6,7 +6,7 @@ import { Language, translations, TranslationKey } from "@/lib/locales";
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: TranslationKey) => string | readonly string[];
+  t: (key: TranslationKey) => any;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -30,7 +30,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(STORAGE_KEY, lang);
   };
 
-  const t = (key: TranslationKey): string | readonly string[] => {
+  const t = (key: TranslationKey): any => {
     return translations[language][key];
   };
 

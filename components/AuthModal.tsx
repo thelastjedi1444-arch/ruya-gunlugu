@@ -147,7 +147,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.95, opacity: 0, y: 20 }}
                         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                        className={`bg-[#1a1a1a] border border-white/10 rounded-2xl w-full ${mode === "register" ? "max-w-2xl" : "max-w-sm"} shadow-2xl shadow-black/50 overflow-hidden transition-all duration-500`}
+                        className={`bg-[#1a1a1a] border border-white/10 rounded-2xl w-full ${mode === "register" ? "max-w-xl" : "max-w-sm"} shadow-2xl shadow-black/50 flex flex-col max-h-[90vh] transition-all duration-500`}
                     >
                         {/* Header */}
                         <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
@@ -169,14 +169,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                         </div>
 
                         {/* Form */}
-                        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+                        <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto">
                             {/* Username */}
                             <div className="space-y-2">
                                 <label className="text-sm text-white/60 font-medium flex justify-between items-center">
                                     <span>{t("username") as string}</span>
                                     {mode === "register" && usernameStatus !== "idle" && (
                                         <span className={`text-[10px] uppercase tracking-wider font-bold ${usernameStatus === "checking" ? "text-white/40" :
-                                                usernameStatus === "available" ? "text-green-400" : "text-red-400"
+                                            usernameStatus === "available" ? "text-green-400" : "text-red-400"
                                             }`}>
                                             {usernameStatus === "checking" ? "..." :
                                                 usernameStatus === "available" ? t("usernameAvailable") : "Bu ad alınmış"}
@@ -190,8 +190,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                         onChange={(e) => setUsername(e.target.value)}
                                         placeholder={t("usernamePlaceholder") as string}
                                         className={`w-full bg-[#0f0f0f] border rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none transition-all duration-300 ${isSuccess ? "border-green-500/50 bg-green-500/5" :
-                                                mode === "register" && usernameStatus === "available" ? "border-green-500/30" :
-                                                    mode === "register" && usernameStatus === "taken" ? "border-red-500/30" : "border-white/10"
+                                            mode === "register" && usernameStatus === "available" ? "border-green-500/30" :
+                                                mode === "register" && usernameStatus === "taken" ? "border-red-500/30" : "border-white/10"
                                             }`}
                                     />
                                     {mode === "register" && usernameStatus === "available" && (
@@ -238,7 +238,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                             onChange={(e) => setConfirmPassword(e.target.value)}
                                             placeholder={t("confirmPasswordPlaceholder") as string}
                                             className={`w-full bg-[#0f0f0f] border rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none transition-all duration-300 ${isSuccess ? "border-green-500/50 bg-green-500/5" :
-                                                    passwordsMatch ? "border-green-500/30" : "border-white/10"
+                                                passwordsMatch ? "border-green-500/30" : "border-white/10"
                                                 }`}
                                         />
                                         {passwordsMatch && (
