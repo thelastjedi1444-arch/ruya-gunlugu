@@ -23,18 +23,25 @@ export default function LoginPage() {
                 body: JSON.stringify({ username, password }),
             });
 
-            const data = await res.json();
+            let data;
+            try {
+                data = await res.json();
+            } catch (jsonError) {
+                console.error("Failed to parse JSON response:", jsonError);
+                throw new Error(`Sunucu hatası: ${res.status} ${res.statusText}`);
+            }
 
             if (!res.ok) {
-                setError(data.error || "Giriş başarısız");
+                setError(data.error || `Giriş başarısız (${res.status})`);
                 setLoading(false);
                 return;
             }
 
             // Redirect to admin panel on success
             router.push("/admin");
-        } catch (err) {
-            setError("Bir hata oluştu. Lütfen tekrar deneyin.");
+        } catch (err: any) {
+            console.error("Login error:", err);
+            setError(err.message || "Bir hata oluştu. Lütfen tekrar deneyin.");
             setLoading(false);
         }
     };
