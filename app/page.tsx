@@ -28,6 +28,8 @@ function DreamJournalContent() {
   const [interpretation, setInterpretation] = useState("");
   const [activeDreamText, setActiveDreamText] = useState("");
   const [dreamId, setDreamId] = useState<string | null>(null);
+  const inputContainerRef = useRef<HTMLDivElement>(null);
+  const [viewportHeight, setViewportHeight] = useState('100vh');
 
   // Auth State
   const { user, loading: authLoading, logout } = useAuth();
@@ -134,6 +136,34 @@ function DreamJournalContent() {
     // Ideally, we might want to only show the user's dreams if logged in, but let's keep it simple
     setDreams(getDreams());
   };
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.visualViewport) return;
+
+    const handleVisualViewportChange = () => {
+      const vv = window.visualViewport;
+      if (!vv) return;
+
+      // Update viewport height dynamically to handle keyboard
+      setViewportHeight(`${vv.height}px`);
+
+      // If keyboard is likely open (viewport significantly smaller than screen)
+      // or if focused on input, ensure it's visible
+      if (document.activeElement?.tagName === 'TEXTAREA' || vv.height < window.innerHeight * 0.8) {
+        setTimeout(() => {
+          inputContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+      }
+    };
+
+    window.visualViewport.addEventListener('resize', handleVisualViewportChange);
+    window.visualViewport.addEventListener('scroll', handleVisualViewportChange);
+
+    return () => {
+      window.visualViewport?.removeEventListener('resize', handleVisualViewportChange);
+      window.visualViewport?.removeEventListener('scroll', handleVisualViewportChange);
+    };
+  }, []);
 
   useEffect(() => {
     loadDreams();
@@ -564,8 +594,8 @@ function DreamJournalContent() {
           onClose={() => setIsSidebarOpen(false)}
         />
 
-        <div className="flex-1 flex flex-col w-full md:ml-80 transition-all duration-300 h-screen overflow-hidden">
-          <div ref={scrollRef} className="flex-1 w-full flex flex-col px-4 md:px-8 space-y-6 pb-36 pt-32 md:pt-20 overflow-y-auto custom-scrollbar max-w-3xl mx-auto">
+        <div style={{ height: viewportHeight }} className="flex-1 flex flex-col w-full md:ml-80 transition-all duration-300 overflow-hidden">
+          <div ref={scrollRef} className="flex-1 w-full flex flex-col px-4 md:px-8 space-y-6 pb-36 pt-32 md:pt-20 overflow-y-auto custom-scrollbar max-w-3xl mx-auto scroll-m-20">
             <div className="flex-1 min-h-[20vh]" />
             <AnimatePresence mode="popLayout">
               {activeDreamText && (
@@ -723,6 +753,8 @@ function DreamJournalContent() {
           </div>
 
           <div
+            ref={inputContainerRef}
+            style={{ height: status === "idle" ? 'auto' : undefined }}
             className={`fixed left-0 md:left-80 right-0 z-50 px-4 pb-6 pt-4 md:px-8 transition-all duration-300
               ${status === "idle"
                 ? "bottom-0 md:top-1/2 md:bottom-auto md:-translate-y-1/2 md:flex md:items-center md:justify-center"
@@ -759,6 +791,11 @@ function DreamJournalContent() {
                       target.value = "";
                       target.style.height = 'auto';
                     }
+                  }}
+                  onFocus={() => {
+                    setTimeout(() => {
+                      inputContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
                   }}
                   disabled={status === "saving"}
                   placeholder={status === "interpreted" || (status === "saved" && interpretation) ? t("tellAnotherDream") as string : status === "saved" ? "Rüyanı yorumla veya yeni bir rüya anlat..." : t("tellYourDream") as string}
