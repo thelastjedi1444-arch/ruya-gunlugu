@@ -43,14 +43,14 @@ export default function ZodiacWheel({ onSelect, selectedSign }: ZodiacWheelProps
     const currentSign = zodiacSigns.find(s => s.name === selectedSign);
 
     return (
-        <div className="flex flex-col items-center space-y-8 py-6 w-full max-w-md mx-auto">
+        <div className="flex flex-col items-center space-y-4 py-2 w-full max-w-md mx-auto">
             {/* Mandated Text */}
             <h3 className="text-xl md:text-2xl font-light text-center text-foreground/90 italic font-serif leading-relaxed px-4">
                 "Yıldızların konumunu paylaş; rüyalarının derinliklerindeki mistik kodları burcunla beraber çözelim."
             </h3>
 
             {/* Wheel Container */}
-            <div className="relative w-64 h-64 md:w-80 md:h-80 flex items-center justify-center">
+            <div className="relative w-56 h-56 md:w-80 md:h-80 flex items-center justify-center my-4 scale-90 md:scale-100">
                 {/* Active Indicator (Pointer) at Top */}
                 <div className="absolute -top-4 w-4 h-4 bg-primary rotate-45 z-20 shadow-[0_0_15px_rgba(var(--primary),0.8)]" />
 
@@ -117,7 +117,7 @@ export default function ZodiacWheel({ onSelect, selectedSign }: ZodiacWheelProps
             </div>
 
             {/* Dynamic Description */}
-            <div className="min-h-[80px] w-full px-6 text-center">
+            <div className="min-h-[60px] w-full px-2 text-center">
                 <AnimatePresence mode="wait">
                     {currentSign && (
                         <motion.div
