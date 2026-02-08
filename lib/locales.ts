@@ -62,6 +62,10 @@ export const translations = {
         processing: "İşleniyor...",
         noAccount: "Hesabın yok mu? Kayıt Ol",
         hasAccount: "Zaten hesabın var mı? Giriş Yap",
+        usernameAvailable: "Kullanıcı adı müsait ✅",
+        passwordsMatch: "Şifreler eşleşti ✅",
+        loginSuccess: "Giriş başarılı! Yönlendiriliyorsunuz...",
+        registerSuccess: "Kayıt başarılı! Hoş geldin ✨",
 
         // Feedback
         feedbackTitle: "Geri Bildiriminiz Bizim İçin Çok Önemli!",
@@ -87,6 +91,13 @@ export const translations = {
         dreamCountLabel: "Rüya Kaydı",
         wordCountLabel: "Kelime",
         interpretationLabel: "Yorum",
+        save: "Kaydet",
+        edit: "Düzenle",
+        profile: "Profil",
+        registrationDate: "Kayıt Tarihi",
+        zodiacSign: "Burç",
+        streakDays: "Gün Serisi",
+        totalDreamsCount: "Toplam Rüya",
     },
     en: {
         // Page - Main
@@ -149,6 +160,10 @@ export const translations = {
         processing: "Processing...",
         noAccount: "Don't have an account? Register",
         hasAccount: "Already have an account? Login",
+        usernameAvailable: "Username is available ✅",
+        passwordsMatch: "Passwords match ✅",
+        loginSuccess: "Login successful! Redirecting...",
+        registerSuccess: "Registration successful! Welcome ✨",
 
         // Feedback
         feedbackTitle: "Your Feedback Matters to Us!",
@@ -174,6 +189,13 @@ export const translations = {
         dreamCountLabel: "Dreams",
         wordCountLabel: "Words",
         interpretationLabel: "Interpretation",
+        save: "Save",
+        edit: "Edit",
+        profile: "Profile",
+        registrationDate: "Registration Date",
+        zodiacSign: "Zodiac Sign",
+        streakDays: "Day Streak",
+        totalDreamsCount: "Total Dreams",
     },
 } as const;
 

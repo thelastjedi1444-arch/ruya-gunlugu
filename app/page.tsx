@@ -16,6 +16,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/hooks/use-language";
 import LanguageToggle from "@/components/LanguageToggle";
 import FeedbackModal from "@/components/FeedbackModal";
+import UserProfileModal from "@/components/UserProfileModal";
 import { deleteDream as deleteDreamStorage, updateUser } from "@/lib/storage";
 import ZodiacWheel from "@/components/ZodiacWheel";
 
@@ -109,6 +110,7 @@ function DreamJournalContent() {
   // Weekly analysis
   const [showWeeklyAnalysis, setShowWeeklyAnalysis] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [showUserProfile, setShowUserProfile] = useState(false);
   const [weeklyAnalysisText, setWeeklyAnalysisText] = useState("");
   const [dayDetail, setDayDetail] = useState<Date | null>(null);
 
@@ -181,6 +183,8 @@ function DreamJournalContent() {
     };
   }, [user]); // Re-run when user changes (login/logout)
 
+
+
   // Check for missing Zodiac Sign
   useEffect(() => {
     if (user && !user.zodiacSign && !hasDismissedZodiac) {
@@ -202,8 +206,9 @@ function DreamJournalContent() {
 
   // Load dream if ID is present
   useEffect(() => {
-    // If we're typing a new dream, ignore ID updates or lack of ID (don't wipe input)
-    if (isTypingNewDreamRef.current) return;
+    // If we're typing a new dream, or currently saving/interpreting, 
+    // ignore ID updates or lack of ID (don't wipe input or reset status)
+    if (isTypingNewDreamRef.current || status === "saving" || status === "interpreting") return;
 
     if (id) {
       const found = dreams.find((d) => d.id === id);
@@ -358,6 +363,13 @@ function DreamJournalContent() {
       setWeeklyAnalysisText(t("analysisError") as string);
     }
   };
+
+  // Update Weekly Analysis content when language changes while it's open
+  useEffect(() => {
+    if (showWeeklyAnalysis) {
+      handleWeeklyAnalysis();
+    }
+  }, [language, showWeeklyAnalysis, handleWeeklyAnalysis]);
 
   const getDreamsForDay = (date: Date) => {
     return dreams.filter(d => isSameDay(parseISO(d.date), date));
@@ -526,8 +538,8 @@ function DreamJournalContent() {
                           {dream.text}
                         </div>
                         {dream.interpretation && (
-                          <div className="bg-gradient-to-br from-indigo-900/20 to-slate-900/20 border border-indigo-500/10 rounded-lg p-4 mt-4">
-                            <div className="flex items-center gap-2 mb-2 text-indigo-300/80 text-sm font-medium uppercase tracking-wider">
+                          <div className="bg-gradient-to-br from-blue-900/20 to-slate-900/20 border border-blue-500/10 rounded-lg p-4 mt-4">
+                            <div className="flex items-center gap-2 mb-2 text-blue-300/80 text-sm font-medium uppercase tracking-wider">
                               <span>🌙</span>
                               <span>{t("interpretationLabel") as string}</span>
                             </div>
@@ -564,6 +576,14 @@ function DreamJournalContent() {
 
       <FeedbackModal isOpen={showFeedbackModal} onClose={() => setShowFeedbackModal(false)} />
 
+      {user && (
+        <UserProfileModal
+          isOpen={showUserProfile}
+          onClose={() => setShowUserProfile(false)}
+          user={user}
+        />
+      )}
+
       <div className="flex w-full min-h-screen relative pt-16">
         {/* Auth Button & Language Toggle */}
         <div className="fixed top-4 right-4 z-[60] flex items-center gap-3">
@@ -575,11 +595,19 @@ function DreamJournalContent() {
           </button>
           <LanguageToggle />
           {user ? (
-            <div className="flex items-center gap-3 bg-[#1a1a1a] border border-white/10 rounded-xl p-1 pr-4 shadow-lg shadow-black/50">
-              <div className="w-8 h-8 rounded-lg bg-[#262626] border border-white/10 flex items-center justify-center text-xs font-bold text-white uppercase transition-colors">
+            <div className="flex items-center gap-3 bg-[#1a1a1a] border border-white/10 rounded-xl p-1 pr-4 shadow-lg shadow-black/50 overflow-hidden">
+              <button
+                onClick={() => setShowUserProfile(true)}
+                className="w-8 h-8 rounded-lg bg-[#262626] border border-white/10 flex items-center justify-center text-xs font-bold text-white uppercase transition-all hover:bg-[#333] active:scale-90"
+              >
                 {user.username.substring(0, 2)}
-              </div>
-              <span className="text-sm font-medium text-white hidden md:inline">{user.username}</span>
+              </button>
+              <span
+                className="text-sm font-medium text-white hidden md:inline cursor-pointer hover:text-indigo-400 transition-colors"
+                onClick={() => setShowUserProfile(true)}
+              >
+                {user.username}
+              </span>
               <button
                 onClick={logout}
                 className="text-xs text-white/50 hover:text-white transition-colors ml-2"
@@ -646,7 +674,7 @@ function DreamJournalContent() {
                   className="w-full flex justify-end"
                 >
                   <div className="bg-[#262626] border border-white/10 text-white px-5 py-3 md:px-6 md:py-4 rounded-2xl rounded-tr-sm max-w-[90%] md:max-w-[75%] text-base md:text-lg shadow-2xl backdrop-blur-sm relative group overflow-hidden break-words">
-                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-slate-500/5 rounded-2xl rounded-tr-sm opacity-50" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-slate-500/5 rounded-2xl rounded-tr-sm opacity-50" />
                     <p className="relative z-10 leading-relaxed font-light tracking-wide text-gray-100 whitespace-pre-wrap break-words">
                       {activeDreamText}
                     </p>
@@ -664,10 +692,10 @@ function DreamJournalContent() {
                 >
                   <div className="flex flex-col items-center gap-3">
                     <div className="relative">
-                      <div className="w-10 h-10 rounded-full border-2 border-indigo-500/20 border-t-indigo-500 animate-spin" />
+                      <div className="w-10 h-10 rounded-full border-2 border-blue-500/20 border-t-blue-500 animate-spin" />
                       <div className="absolute inset-0 flex items-center justify-center text-xs">🌙</div>
                     </div>
-                    <span className="text-sm font-medium text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-slate-300 animate-pulse tracking-widest uppercase">
+                    <span className="text-sm font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-slate-300 animate-pulse tracking-widest uppercase">
                       {status === "saving" ? t("savingDream") as string : t("interpretingDream") as string}
                     </span>
                   </div>
@@ -682,11 +710,11 @@ function DreamJournalContent() {
                   className="w-full flex justify-start"
                 >
                   <div className="flex gap-3 md:gap-4 max-w-[95%] md:max-w-[80%]">
-                    <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-indigo-900 to-slate-800 flex items-center justify-center shadow-lg shadow-indigo-500/10 mt-1 border border-white/5">
+                    <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-900 to-slate-800 flex items-center justify-center shadow-lg shadow-blue-500/10 mt-1 border border-white/5">
                       <span className="text-white text-xs">🌙</span>
                     </div>
                     <div className="flex flex-col gap-2">
-                      <span className="text-xs font-semibold text-indigo-300 tracking-widest uppercase ml-1">{t("interpretation") as string}</span>
+                      <span className="text-xs font-semibold text-blue-300 tracking-widest uppercase ml-1">{t("interpretation") as string}</span>
                       <div className="bg-[#1a1a1a]/80 border border-white/5 px-5 py-4 md:px-6 md:py-5 rounded-2xl rounded-tl-sm shadow-xl backdrop-blur-md overflow-hidden break-words">
                         <div className="prose prose-invert prose-base md:prose-lg max-w-none text-gray-300 font-light leading-7 md:leading-8 whitespace-pre-wrap break-words">
                           <SmoothScrollText

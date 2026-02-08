@@ -141,8 +141,8 @@ export default function CalendarPage() {
                                                 </div>
 
                                                 {dream.interpretation && (
-                                                    <div className="bg-gradient-to-br from-purple-900/10 to-blue-900/10 border border-purple-500/10 rounded-lg p-4 mt-4">
-                                                        <div className="flex items-center gap-2 mb-2 text-purple-300/80 text-sm font-medium uppercase tracking-wider">
+                                                    <div className="bg-gradient-to-br from-blue-900/10 to-blue-800/10 border border-blue-500/10 rounded-lg p-4 mt-4">
+                                                        <div className="flex items-center gap-2 mb-2 text-blue-300/80 text-sm font-medium uppercase tracking-wider">
                                                             <span>✨</span>
                                                             <span>{t("interpretation") as string}</span>
                                                         </div>

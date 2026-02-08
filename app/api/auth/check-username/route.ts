@@ -1,22 +1,23 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function POST(req: Request) {
+export async function GET(req: Request) {
     try {
-        const { username } = await req.json();
+        const { searchParams } = new URL(req.url);
+        const username = searchParams.get('username');
 
         if (!username) {
-            return NextResponse.json({ error: 'Username is required' }, { status: 400 });
+            return NextResponse.json({ error: 'Username required' }, { status: 400 });
         }
 
-        const user = await prisma.user.findUnique({
+        const existingUser = await prisma.user.findUnique({
             where: { username },
         });
 
-        return NextResponse.json({ available: !user });
+        return NextResponse.json({ available: !existingUser });
 
     } catch (error) {
-        console.error('Check username error:', error);
+        console.error('Username check error:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

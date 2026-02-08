@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export const zodiacSigns = [
@@ -11,7 +10,7 @@ export const zodiacSigns = [
     { name: "Aslan", symbol: "♌", element: "Ateş", traits: "Yaratıcı, tutkulu, cömert", description: "Rüyalarınız parlak ve sahne ışıklarıyla doludur; içsel gücünüzü ve liderlik potansiyelinizi yansıtır." },
     { name: "Başak", symbol: "♍", element: "Toprak", traits: "Analitik, çalışkan, pratik", description: "Rüyalarınız detaycı ve düzenleyicidir; hayatınızdaki karmaşayı çözmeniz için size rehberlik eder." },
     { name: "Terazi", symbol: "♎", element: "Hava", traits: "Diplomatik, zarif, adil", description: "Rüyalarınız estetik ve denge arayışındadır; ilişkilerinizdeki uyumu veya çatışmayı size aynalar." },
-    { name: "Akrep", symbol: "♏", element: "Su", traits: "Tutkulu, inatçı, becerikli", description: "Gizemli ve yoğun rüyalarınızla bilinçaltınızın en derin sırlarını keşfedersiniz; dönüşüm kaçınılmazdır." },
+    { name: "Akrep", symbol: "♏", element: "Su", traits: "Tutkulu, inatçı, becerikli", description: "Gizemli ve yoğun rüyalarınızla bilinçaltınızın en derin sırlarını keşfederiniz; dönüşüm kaçınılmazdır." },
     { name: "Yay", symbol: "♐", element: "Ateş", traits: "Cömert, idealist, esprili", description: "Rüyalarınız keşif ve macera doludur; size yeni ufuklar ve felsefi bakış açıları sunar." },
     { name: "Oğlak", symbol: "♑", element: "Toprak", traits: "Sorumlu, disiplinli, yönetici", description: "Rüyalarınız hedefler ve yapılarla ilgilidir; size başarıya giden yolda disiplinli mesajlar verir." },
     { name: "Kova", symbol: "♒", element: "Hava", traits: "İlerici, orijinal, bağımsız", description: "Rüyalarınız sıra dışı ve futuristiktir; toplumsal olaylara veya geleceğe dair vizyonlar sunabilir." },
@@ -21,120 +20,104 @@ export const zodiacSigns = [
 interface ZodiacWheelProps {
     onSelect: (sign: string) => void;
     selectedSign: string | undefined;
+    t?: (key: any) => any;
 }
 
-export default function ZodiacWheel({ onSelect, selectedSign }: ZodiacWheelProps) {
-    const [rotation, setRotation] = useState(0);
-
-    const handleSignClick = (index: number) => {
-        // Calculate rotation needed to bring this sign to top (or center)
-        // 12 signs, 30 degrees each.
-        // If index 0 is at top (0 deg), clicking index 1 (30 deg) should rotate wheel by -30 deg.
-        const anglePerItem = 360 / zodiacSigns.length;
-        const targetRotation = -index * anglePerItem;
-
-        // Adjust rotation to be smooth (find shortest path)
-        // Current rotation might be 360 * n. 
-        // This simple logic is fine for basic interaction.
-        setRotation(targetRotation);
-        onSelect(zodiacSigns[index].name);
-    };
-
+export default function ZodiacWheel({ onSelect, selectedSign, t = (key) => key }: ZodiacWheelProps) {
     const currentSign = zodiacSigns.find(s => s.name === selectedSign);
 
     return (
-        <div className="flex flex-col items-center space-y-4 py-2 w-full max-w-md mx-auto">
-            {/* Mandated Text */}
-            <h3 className="text-xl md:text-2xl font-light text-center text-foreground/90 italic font-serif leading-relaxed px-4">
-                "Yıldızların konumunu paylaş; rüyalarının derinliklerindeki mistik kodları burcunla beraber çözelim."
-            </h3>
+        <div className="w-full space-y-6">
+            {/* Instruction Text */}
+            <div className="text-center px-4">
+                <h3 className="text-base md:text-lg font-light text-white/90 italic font-serif leading-relaxed">
+                    "{t("zodiacInstruction") || "Yıldızların konumunu paylaş; rüyalarının derinliklerindeki mistik kodları burcunla beraber çözelim."}"
+                </h3>
+            </div>
 
-            {/* Wheel Container */}
-            <div className="relative w-56 h-56 md:w-80 md:h-80 flex items-center justify-center my-4 scale-90 md:scale-100">
-                {/* Active Indicator (Pointer) at Top */}
-                <div className="absolute -top-4 w-4 h-4 bg-primary rotate-45 z-20 shadow-[0_0_15px_rgba(var(--primary),0.8)]" />
-
-                {/* The Rotating Wheel */}
-                <motion.div
-                    className="relative w-full h-full rounded-full border-2 border-primary/20 bg-background/50 backdrop-blur-sm shadow-[0_0_30px_rgba(var(--primary),0.1)]"
-                    animate={{ rotate: rotation }}
-                    transition={{ type: "spring", stiffness: 50, damping: 20 }}
-                >
-                    {zodiacSigns.map((sign, index) => {
-                        const angle = (index * 360) / zodiacSigns.length;
-                        const radius = 100; // base radius percentage? No, px.
-                        // Using absolute positioning from center
-                        // 0 deg is top? CSS rotate starts from heavy right usually if not adjusted.
-                        // Let's assume standard intuitive clock. 0 is top (12 o'clock).
-                        // Transform origin is center.
-                        return (
-                            <motion.button
-                                key={sign.name}
-                                className={`absolute w-12 h-12 -ml-6 -mt-6 flex items-center justify-center rounded-full text-2xl transition-all duration-300
-                  ${selectedSign === sign.name ? "scale-125 bg-primary/20 text-primary shadow-glow" : "text-muted-foreground hover:text-foreground hover:scale-110"}`}
+            {/* Grid Selection */}
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 md:gap-3">
+                {zodiacSigns.map((sign) => {
+                    const isSelected = selectedSign === sign.name;
+                    return (
+                        <motion.button
+                            key={sign.name}
+                            type="button"
+                            onClick={() => onSelect(sign.name)}
+                            whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.05)" }}
+                            whileTap={{ scale: 0.95 }}
+                            className={`
+                                relative flex flex-col items-center justify-center p-2 md:p-3 rounded-xl border transition-all duration-300
+                                ${isSelected
+                                    ? "bg-blue-500/10 border-blue-500 ring-1 ring-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.15)]"
+                                    : "bg-white/5 border-white/10 hover:border-white/20"
+                                }
+                            `}
+                        >
+                            <span
+                                className={`text-xl md:text-2xl mb-1 ${isSelected ? "text-blue-400" : "text-white/60"}`}
                                 style={{
-                                    top: "50%",
-                                    left: "50%",
-                                    transform: `rotate(${angle}deg) translate(0, -${110}px) rotate(-${angle}deg)`,
-                                    // translate Y -110px moves it UP from center.
-                                    // rotate(-angle) keeps the text upright.
+                                    textShadow: "0 0 8px currentColor", // Changed to create a glow effect
+                                    // Removed color: "transparent" to make the text visible
+                                    filter: "brightness(1.5)"
                                 }}
-                                onClick={(e) => {
-                                    e.stopPropagation(); // Prevent modal close or other clicks?
-                                    handleSignClick(index);
-                                }}
-                                whileHover={{ scale: 1.2 }}
-                                whileTap={{ scale: 0.95 }}
                             >
                                 {sign.symbol}
-                            </motion.button>
-                        );
-                    })}
+                            </span>
+                            <span className={`text-[9px] md:text-[10px] font-bold tracking-widest uppercase text-center ${isSelected ? "text-blue-400" : "text-white/40"}`}>
+                                {sign.name}
+                            </span>
 
-                    {/* Inner Decorative Circle */}
-                    <div className="absolute inset-0 m-auto w-2/3 h-2/3 rounded-full border border-primary/10 border-dashed animate-spin-slow" style={{ animationDuration: '60s' }} />
-                </motion.div>
+                            {isSelected && (
+                                <motion.div
+                                    layoutId="zodiac-active-glow"
+                                    className="absolute inset-0 rounded-xl bg-blue-500/5 pointer-events-none"
+                                />
+                            )}
+                        </motion.button>
+                    );
+                })}
+            </div>
 
-                {/* Center Display (Static or fading) */}
-                <div className="absolute inset-0 m-auto w-24 h-24 flex items-center justify-center rounded-full bg-background/80 backdrop-blur-md border border-primary/30 z-10 pointer-events-none">
-                    <AnimatePresence mode="wait">
-                        {currentSign ? (
-                            <motion.div
-                                key={currentSign.name}
-                                initial={{ opacity: 0, scale: 0.5 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.5 }}
-                                className="text-center"
+            {/* Dynamic Description Box */}
+            <AnimatePresence mode="wait">
+                {currentSign ? (
+                    <motion.div
+                        key={currentSign.name}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="p-4 md:p-5 rounded-2xl bg-blue-500/5 border border-blue-500/20 backdrop-blur-sm"
+                    >
+                        <div className="flex items-center gap-3 mb-2">
+                            <span
+                                className="text-2xl md:text-3xl text-blue-400"
+                                style={{
+                                    textShadow: "0 0 8px #60a5fa", // Changed to create a glow effect
+                                    // Removed color: "transparent" to make the text visible
+                                }}
                             >
-                                <div className="text-4xl mb-1">{currentSign.symbol}</div>
-                                <div className="text-xs font-bold tracking-widest uppercase text-primary">{currentSign.name}</div>
-                            </motion.div>
-                        ) : (
-                            <span className="text-4xl opacity-20">✨</span>
-                        )}
-                    </AnimatePresence>
-                </div>
-            </div>
-
-            {/* Dynamic Description */}
-            <div className="min-h-[60px] w-full px-2 text-center">
-                <AnimatePresence mode="wait">
-                    {currentSign && (
-                        <motion.div
-                            key={currentSign.name}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            className="space-y-2"
-                        >
-                            <h4 className="text-lg font-semibold text-primary">{currentSign.name} ({currentSign.element})</h4>
-                            <p className="text-sm md:text-base text-muted-foreground leading-snug">
-                                "{currentSign.description}"
-                            </p>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
+                                {currentSign.symbol}
+                            </span>
+                            <div>
+                                <h4 className="text-sm md:text-base font-semibold text-blue-400">
+                                    {currentSign.name} <span className="text-white/30 text-xs font-normal ml-2">({currentSign.element})</span>
+                                </h4>
+                                <p className="text-[9px] md:text-[10px] text-blue-400/60 font-medium tracking-widest uppercase">
+                                    {currentSign.traits}
+                                </p>
+                            </div>
+                        </div>
+                        <p className="text-xs md:text-sm text-white/70 leading-relaxed font-light mt-2 border-t border-white/5 pt-3">
+                            "{currentSign.description}"
+                        </p>
+                    </motion.div>
+                ) : (
+                    <div className="h-20 md:h-24 flex items-center justify-center rounded-2xl border border-dashed border-white/5 text-white/20 text-xs md:text-sm">
+                        {t("selectZodiacPlaceholder") || "Bir burç seçerek rüya yorumunu derinleştir..."}
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

@@ -1,3 +1,4 @@
+import { format, parseISO, isSameDay, addDays } from "date-fns";
 // Helper to generate IDs safely across different environments (secure & non-secure contexts)
 const generateId = () => {
     try {
@@ -166,6 +167,44 @@ export const deleteDream = (id: string) => {
     }
 };
 
+// Streak Calculation helper
+export const calculateStreak = (userId?: string | null): number => {
+    if (typeof window === "undefined") return 0;
+    const dreams = getDreams(userId);
+    if (dreams.length === 0) return 0;
+
+    // Get unique dates with dreams, sorted descending
+    const dreamDates = Array.from(new Set(
+        dreams.map(d => format(parseISO(d.date), "yyyy-MM-dd"))
+    )).sort((a, b) => b.localeCompare(a));
+
+    const todayStr = format(new Date(), "yyyy-MM-dd");
+    const yesterdayDate = new Date();
+    yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+    const yesterdayStr = format(yesterdayDate, "yyyy-MM-dd");
+
+    let streak = 0;
+    let currentDate = new Date();
+
+    // Check if the streak is active (has dream today or yesterday)
+    const hasDreamToday = dreamDates.includes(todayStr);
+    const hasDreamYesterday = dreamDates.includes(yesterdayStr);
+
+    if (!hasDreamToday && !hasDreamYesterday) return 0;
+
+    // Start checking from today or yesterday
+    let checkDateString = hasDreamToday ? todayStr : yesterdayStr;
+    let checkDate = hasDreamToday ? new Date() : yesterdayDate;
+
+    while (dreamDates.includes(checkDateString)) {
+        streak++;
+        checkDate.setDate(checkDate.getDate() - 1);
+        checkDateString = format(checkDate, "yyyy-MM-dd");
+    }
+
+    return streak;
+};
+
 export const getStorageStats = (userId?: string | null) => {
     const dreams = getDreams(userId);
     const users = getUsers();
@@ -192,6 +231,7 @@ export const getStorageStats = (userId?: string | null) => {
         storageBytes: storageUsed,
         totalUsers: users.length,
         totalFeedbacks: feedbacks.length,
+        streak: calculateStreak(userId),
     };
 };
 

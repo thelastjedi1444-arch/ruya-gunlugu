@@ -49,7 +49,7 @@ export default function AdminDashboard() {
     };
 
     return (
-        <div className="min-h-screen bg-[#0a0a0a] text-white p-6 md:p-12 font-sans selection:bg-purple-500/30">
+        <div className="min-h-screen bg-[#0a0a0a] text-white p-6 md:p-12 font-sans selection:bg-blue-500/30">
 
             {/* Header */}
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-12">
@@ -98,8 +98,8 @@ export default function AdminDashboard() {
                         title="Toplam Rüya"
                         value={stats.totalDreams}
                         icon="🌙"
-                        color="from-purple-500/20 to-blue-500/20"
-                        border="border-purple-500/20"
+                        color="from-blue-600/20 to-blue-400/20"
+                        border="border-blue-500/20"
                         onClick={() => setActiveTab("dreams")}
                     />
                     <StatCard
@@ -121,15 +121,15 @@ export default function AdminDashboard() {
                         title="Yorumlanan"
                         value={stats.interpretedDreams}
                         icon="✨"
-                        color="from-pink-500/20 to-rose-500/20"
-                        border="border-pink-500/20"
+                        color="from-blue-500/20 to-cyan-500/20"
+                        border="border-blue-500/20"
                     />
                     <StatCard
                         title="Geri Bildirim"
                         value={stats.totalFeedbacks}
                         icon="💬"
-                        color="from-indigo-500/20 to-purple-500/20"
-                        border="border-indigo-500/20"
+                        color="from-blue-400/20 to-cyan-400/20"
+                        border="border-blue-400/20"
                         onClick={() => setActiveTab("feedback")}
                     />
                 </div>
@@ -155,7 +155,7 @@ export default function AdminDashboard() {
                                             {userDreamCount} Rüya
                                         </div>
                                     </div>
-                                    <h3 className="text-lg font-medium text-white mb-1 group-hover:text-purple-400 transition-colors">
+                                    <h3 className="text-lg font-medium text-white mb-1 group-hover:text-blue-400 transition-colors">
                                         {user.username}
                                     </h3>
                                     <p className="text-sm text-white/30">
@@ -185,7 +185,7 @@ export default function AdminDashboard() {
                                         {format(parseISO(dream.date), "d MMM HH:mm", { locale: tr })}
                                     </div>
                                     {dream.username && (
-                                        <div className="text-xs font-medium text-purple-400 px-2 py-0.5 rounded bg-purple-500/10 border border-purple-500/20 flex items-center gap-1">
+                                        <div className="text-xs font-medium text-blue-400 px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 flex items-center gap-1">
                                             <span>👤</span> {dream.username}
                                         </div>
                                     )}
@@ -193,7 +193,7 @@ export default function AdminDashboard() {
                             </div>
                             <p className="text-white/80 text-sm line-clamp-2 md:line-clamp-none">{dream.text}</p>
                             {dream.interpretation && (
-                                <div className="mt-3 pl-4 border-l-2 border-purple-500/30 text-xs text-white/50 italic">
+                                <div className="mt-3 pl-4 border-l-2 border-blue-500/30 text-xs text-white/50 italic">
                                     ✨ {dream.interpretation.substring(0, 100)}...
                                 </div>
                             )}
@@ -211,14 +211,14 @@ export default function AdminDashboard() {
             {activeTab === "feedback" && (
                 <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     {feedbacks.map((feedback) => (
-                        <div key={feedback.id} className="bg-[#1a1a1a] border border-white/5 rounded-xl p-5 hover:border-indigo-500/20 transition-colors group">
+                        <div key={feedback.id} className="bg-[#1a1a1a] border border-white/5 rounded-xl p-5 hover:border-blue-500/20 transition-colors group">
                             <div className="flex justify-between items-start mb-3">
                                 <div className="flex items-center gap-3 flex-wrap">
-                                    <div className="text-xs font-medium text-indigo-400 px-2 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/20">
+                                    <div className="text-xs font-medium text-blue-400 px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/20">
                                         {format(parseISO(feedback.createdAt), "d MMM yyyy HH:mm", { locale: tr })}
                                     </div>
                                     {feedback.username && (
-                                        <div className="text-xs font-medium text-purple-400 px-2 py-0.5 rounded bg-purple-500/10 border border-purple-500/20 flex items-center gap-1">
+                                        <div className="text-xs font-medium text-blue-400 px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 flex items-center gap-1">
                                             <span>👤</span> {feedback.username}
                                         </div>
                                     )}
@@ -234,7 +234,7 @@ export default function AdminDashboard() {
                     ))}
                     {feedbacks.length === 0 && (
                         <div className="text-center py-20">
-                            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
+                            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
                                 <span className="text-2xl">💬</span>
                             </div>
                             <p className="text-white/30">Henüz geri bildirim yok.</p>
@@ -287,8 +287,8 @@ export default function AdminDashboard() {
                                             </div>
                                             <p className="text-white/80 text-sm">{dream.text}</p>
                                             {dream.interpretation && (
-                                                <div className="mt-3 bg-purple-900/10 p-3 rounded-lg border border-purple-500/10">
-                                                    <p className="text-xs text-purple-300/70 italic">
+                                                <div className="mt-3 bg-blue-900/10 p-3 rounded-lg border border-blue-500/10">
+                                                    <p className="text-xs text-blue-300/70 italic">
                                                         ✨ {dream.interpretation}
                                                     </p>
                                                 </div>

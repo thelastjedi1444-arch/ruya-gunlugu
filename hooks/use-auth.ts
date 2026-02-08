@@ -5,11 +5,12 @@ export function useAuth() {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
-    const checkAuth = () => {
+    const checkAuth = async () => {
         try {
-            const stored = localStorage.getItem("user");
-            if (stored) {
-                setUser(JSON.parse(stored));
+            const res = await fetch("/api/auth/me");
+            if (res.ok) {
+                const data = await res.json();
+                setUser(data.user);
             } else {
                 setUser(null);
             }
@@ -21,9 +22,14 @@ export function useAuth() {
         }
     };
 
-    const logout = () => {
-        localStorage.removeItem("user");
-        window.dispatchEvent(new Event("auth-change"));
+    const logout = async () => {
+        try {
+            await fetch("/api/auth/logout", { method: "POST" });
+            setUser(null);
+            window.dispatchEvent(new Event("auth-change"));
+        } catch (error) {
+            console.error('Logout failed', error);
+        }
     };
 
     useEffect(() => {

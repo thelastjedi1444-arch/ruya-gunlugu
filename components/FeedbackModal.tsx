@@ -142,7 +142,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                                         value={message}
                                         onChange={(e) => setMessage(e.target.value)}
                                         placeholder={t("feedbackPlaceholder") as string}
-                                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-white/20 transition-all text-sm min-h-[100px] resize-none"
+                                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-white/20 transition-all text-sm min-h-[100px] resize-none"
                                     />
                                 </div>
 
@@ -153,12 +153,12 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                                                 type="checkbox"
                                                 checked={contactPermission}
                                                 onChange={(e) => setContactPermission(e.target.checked)}
-                                                className="peer appearance-none w-5 h-5 border border-white/10 rounded bg-white/5 checked:bg-purple-500 checked:border-purple-500 transition-all cursor-pointer"
+                                                className="peer appearance-none w-5 h-5 border border-white/10 rounded bg-white/5 checked:bg-blue-500 checked:border-blue-500 transition-all cursor-pointer"
                                             />
                                             <Check className="absolute w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 left-0.5 pointer-events-none transition-opacity" />
                                         </div>
                                         <span className="text-xs text-white/50 group-hover:text-white/70 transition-colors pt-0.5">
-                                            {t("feedbackContactPermission") as string} <span className="text-purple-400 hover:underline cursor-pointer">{t("feedbackPrivacyPolicy") as string}</span>
+                                            {t("feedbackContactPermission") as string} <span className="text-blue-400 hover:underline cursor-pointer">{t("feedbackPrivacyPolicy") as string}</span>
                                         </span>
                                     </label>
 
@@ -168,7 +168,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                                                 type="checkbox"
                                                 checked={helpImprove}
                                                 onChange={(e) => setHelpImprove(e.target.checked)}
-                                                className="peer appearance-none w-5 h-5 border border-white/10 rounded bg-white/5 checked:bg-purple-500 checked:border-purple-500 transition-all cursor-pointer"
+                                                className="peer appearance-none w-5 h-5 border border-white/10 rounded bg-white/5 checked:bg-blue-500 checked:border-blue-500 transition-all cursor-pointer"
                                             />
                                             <Check className="absolute w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 left-0.5 pointer-events-none transition-opacity" />
                                         </div>
@@ -191,7 +191,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                                         className={`
                                             px-8 py-2.5 rounded-xl text-sm font-semibold transition-all
                                             ${(rating || message.trim()) && status !== "sending"
-                                                ? "bg-purple-500 text-white shadow-lg shadow-purple-500/20 hover:scale-105 active:scale-95"
+                                                ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20 hover:scale-105 active:scale-95"
                                                 : "bg-white/5 text-white/20 cursor-not-allowed"}
                                         `}
                                     >

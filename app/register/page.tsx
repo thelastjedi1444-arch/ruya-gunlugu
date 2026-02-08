@@ -87,7 +87,7 @@ export default function RegisterPage() {
                 transition={{ duration: 0.5, ease: "easeOut" }}
                 className="w-full max-w-md"
             >
-                <div className="bg-gradient-to-br from-[#111] to-[#0a0a0a] border border-white/10 rounded-3xl p-8 shadow-2xl shadow-purple-900/10">
+                <div className="bg-gradient-to-br from-[#111] to-[#0a0a0a] border border-white/10 rounded-3xl p-8 shadow-2xl shadow-blue-900/10">
 
                     {/* Header */}
                     <div className="text-center mb-8">
@@ -111,10 +111,10 @@ export default function RegisterPage() {
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
                                     className={`w-full px-4 py-3 bg-[#1a1a1a] border rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 transition-all ${isUsernameAvailable === true
-                                            ? "border-green-500/50 focus:ring-green-500/50"
-                                            : isUsernameAvailable === false
-                                                ? "border-red-500/50 focus:ring-red-500/50"
-                                                : "border-white/10 focus:ring-purple-500/50 focus:border-transparent"
+                                        ? "border-green-500/50 focus:ring-green-500/50"
+                                        : isUsernameAvailable === false
+                                            ? "border-red-500/50 focus:ring-red-500/50"
+                                            : "border-white/10 focus:ring-blue-500/50 focus:border-transparent"
                                         }`}
                                     placeholder="Kullanıcı adınızı seçin"
                                     required
@@ -170,7 +170,7 @@ export default function RegisterPage() {
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full px-4 py-3 bg-[#1a1a1a] border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all"
+                                className="w-full px-4 py-3 bg-[#1a1a1a] border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all"
                                 placeholder="Şifrenizi belirleyin"
                                 required
                                 autoComplete="new-password"

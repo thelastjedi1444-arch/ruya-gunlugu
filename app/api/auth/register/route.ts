@@ -17,7 +17,7 @@ export async function POST(req: Request) {
         });
 
         if (existingUser) {
-            return NextResponse.json({ error: 'Username already taken' }, { status: 409 });
+            return NextResponse.json({ error: 'Bu kullanıcı adı zaten alınmış.' }, { status: 409 });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);

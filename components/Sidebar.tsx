@@ -312,10 +312,10 @@ export default function Sidebar({ isOpen, dreams, onSelectDream, onDeleteDream, 
                 <div className="mt-auto px-4 pt-4 border-t border-[#262626]">
                     <button
                         onClick={onWeeklyAnalysis}
-                        className="w-full py-3 rounded-lg border border-indigo-500/20 bg-gradient-to-br from-indigo-900/20 to-blue-900/20 hover:from-indigo-800/30 hover:to-blue-800/30 hover:border-indigo-400/40 transition-all flex items-center justify-center gap-2 group cursor-pointer"
+                        className="w-full py-3 rounded-lg border border-blue-500/20 bg-gradient-to-br from-blue-900/20 to-cyan-900/20 hover:from-blue-800/30 hover:to-cyan-800/30 hover:border-blue-400/40 transition-all flex items-center justify-center gap-2 group cursor-pointer"
                     >
                         <span className="text-xl">🌙</span>
-                        <span className="text-sm font-medium text-indigo-200 group-hover:text-indigo-100 uppercase tracking-wider">
+                        <span className="text-sm font-medium text-blue-200 group-hover:text-blue-100 uppercase tracking-wider">
                             {t("weeklyAnalysis") as string}
                         </span>
                     </button>
