@@ -694,23 +694,13 @@ function DreamJournalContent() {
 
                   <motion.button
                     onClick={handleInterpret}
-                    disabled={status === "interpreting"}
                     whileTap={{ scale: 0.95 }}
                     transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                    className={`group flex flex-col items-center gap-3 px-8 py-4 border border-[#262626] rounded-full hover:border-white/20 hover:bg-[#111] transition-all ${status === "interpreting" ? "opacity-70 cursor-wait" : ""}`}
+                    className="group flex flex-col items-center gap-3 px-8 py-4 border border-[#262626] rounded-full hover:border-white/20 hover:bg-[#111] transition-all"
                   >
-                    {status === "interpreting" ? (
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-muted/30 border-t-muted rounded-full animate-spin" />
-                        <span className="text-sm tracking-[0.2em] uppercase text-muted">
-                          {language === "tr" ? "Yorumlanıyor..." : "Interpreting..."}
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="text-sm tracking-[0.2em] uppercase text-muted group-hover:text-white transition-colors">
-                        {t("interpretDream") as string}
-                      </span>
-                    )}
+                    <span className="text-sm tracking-[0.2em] uppercase text-muted group-hover:text-white transition-colors">
+                      {t("interpretDream") as string}
+                    </span>
                   </motion.button>
                 </motion.div>
               )}
