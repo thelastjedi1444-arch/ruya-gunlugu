@@ -21,6 +21,7 @@ export const translations = {
         comment: "Yorum",
         gatheringWhispers: "✨ Haftanın fısıltıları toplanıyor...",
         analysisError: "Analiz sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
+        interpretOrTellDream: "Rüyanı yorumla veya yeni bir rüya anlat...",
 
         // Sidebar
         newDream: "Yeni Rüya Yaz",
@@ -107,6 +108,7 @@ export const translations = {
         comment: "Comment",
         gatheringWhispers: "✨ Gathering the week's whispers...",
         analysisError: "An error occurred during analysis. Please try again later.",
+        interpretOrTellDream: "Interpret your dream or tell a new one...",
 
         // Sidebar
         newDream: "Write New Dream",

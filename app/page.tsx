@@ -23,6 +23,7 @@ function DreamJournalContent() {
   const router = useRouter();
   const id = searchParams.get("id");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const isTypingNewDreamRef = useRef(false);
 
   const [dream, setDream] = useState("");
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "interpreting" | "interpreted">("idle");
@@ -178,6 +179,9 @@ function DreamJournalContent() {
 
   // Load dream if ID is present
   useEffect(() => {
+    // If we're typing a new dream, ignore ID updates or lack of ID (don't wipe input)
+    if (isTypingNewDreamRef.current) return;
+
     if (id) {
       const found = dreams.find((d) => d.id === id);
       if (found) {
@@ -296,6 +300,7 @@ function DreamJournalContent() {
   };
 
   const handleSelectDream = (selectedId: string) => {
+    isTypingNewDreamRef.current = false;
     router.push(`/?id=${selectedId}`);
   };
 
@@ -766,7 +771,7 @@ function DreamJournalContent() {
                     exit={{ opacity: 0, y: -10 }}
                     className="text-xl md:text-2xl font-light text-foreground/70 tracking-wide text-center mb-2"
                   >
-                    {user ? `${t("welcomeUser")} ${user.username}, ${language === "tr" ? "zihnin sana ne fısıldadı?" : "what did your mind whisper to you?"}` : t("whisperQuestion") as string}
+                    {user ? `${t("welcomeUser")} ${user.username}, ${(t("whisperQuestion") as string).toLowerCase()}` : t("whisperQuestion") as string}
                   </motion.h1>
                 )}
               </AnimatePresence>
@@ -774,7 +779,23 @@ function DreamJournalContent() {
                 <textarea
                   value={dream}
                   onChange={(e) => {
-                    setDream(e.target.value);
+                    const newValue = e.target.value;
+
+                    // If we are showing an interpretation, reset immediately on typing
+                    if (status === "interpreted" || (status === "saved" && interpretation)) {
+                      isTypingNewDreamRef.current = true;
+
+                      // Critical: Wipe existing state but keep input focused and typing
+                      setStatus("idle");
+                      setInterpretation("");
+                      setActiveDreamText("");
+                      setDreamId(null);
+
+                      // Silently clear URL without full reload to prevent state wipe
+                      window.history.pushState({}, '', '/');
+                    }
+
+                    setDream(newValue);
                     e.target.style.height = 'auto';
                     e.target.style.height = `${Math.min(e.target.scrollHeight, 128)}px`;
                   }}
@@ -793,7 +814,7 @@ function DreamJournalContent() {
                     }, 300);
                   }}
                   disabled={status === "saving"}
-                  placeholder={status === "interpreted" || (status === "saved" && interpretation) ? t("tellAnotherDream") as string : status === "saved" ? "Rüyanı yorumla veya yeni bir rüya anlat..." : t("tellYourDream") as string}
+                  placeholder={status === "interpreted" || (status === "saved" && interpretation) ? t("tellAnotherDream") as string : status === "saved" ? t("interpretOrTellDream") as string : t("tellYourDream") as string}
                   className="flex-1 bg-transparent text-base md:text-lg text-foreground placeholder:text-muted/30 resize-none focus:outline-none py-1 max-h-32 min-h-[28px] scrollbar-hide disabled:opacity-50"
                   rows={1}
                 />
