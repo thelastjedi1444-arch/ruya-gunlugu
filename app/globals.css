@@ -39,3 +39,18 @@ body {
   background: var(--color-muted);
   border-radius: 3px;
 }
+
+/* Button touch optimization for mobile */
+button,
+[role="button"],
+a {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Active state feedback */
+button:active:not(:disabled),
+[role="button"]:active:not(:disabled) {
+  transform: scale(0.97);
+  transition: transform 0.1s ease;
+}

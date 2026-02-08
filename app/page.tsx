@@ -662,14 +662,26 @@ function DreamJournalContent() {
                     </motion.div>
                   </motion.div>
 
-                  <button
+                  <motion.button
                     onClick={handleInterpret}
-                    className="group flex flex-col items-center gap-3 px-8 py-4 border border-[#262626] rounded-full hover:border-white/20 hover:bg-[#111] transition-all"
+                    disabled={status === "interpreting"}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                    className={`group flex flex-col items-center gap-3 px-8 py-4 border border-[#262626] rounded-full hover:border-white/20 hover:bg-[#111] transition-all ${status === "interpreting" ? "opacity-70 cursor-wait" : ""}`}
                   >
-                    <span className="text-sm tracking-[0.2em] uppercase text-muted group-hover:text-white transition-colors">
-                      {t("interpretDream") as string}
-                    </span>
-                  </button>
+                    {status === "interpreting" ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-muted/30 border-t-muted rounded-full animate-spin" />
+                        <span className="text-sm tracking-[0.2em] uppercase text-muted">
+                          {language === "tr" ? "Yorumlanıyor..." : "Interpreting..."}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-sm tracking-[0.2em] uppercase text-muted group-hover:text-white transition-colors">
+                        {t("interpretDream") as string}
+                      </span>
+                    )}
+                  </motion.button>
                 </motion.div>
               )}
 
@@ -754,9 +766,11 @@ function DreamJournalContent() {
                   rows={1}
                 />
                 {/* Microphone Button */}
-                <button
+                <motion.button
                   onClick={toggleListening}
                   type="button"
+                  whileTap={{ scale: 0.9 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   className={`p-2 rounded-full transition-all duration-300 ${isListening
                     ? "bg-red-500 text-white animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.5)]"
                     : "bg-[#262626] text-muted/50 hover:text-white hover:bg-[#333]"}`}
@@ -767,12 +781,14 @@ function DreamJournalContent() {
                     <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
                     <line x1="12" x2="12" y1="19" y2="22" />
                   </svg>
-                </button>
-                <button
+                </motion.button>
+                <motion.button
                   onClick={handleSave}
                   disabled={!dream.trim() || status === "saving"}
+                  whileTap={{ scale: 0.9 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   className={`p-2 rounded-full transition-all duration-300 ${dream.trim() && status !== "saving"
-                    ? "bg-white text-black hover:scale-105 shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+                    ? "bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.3)]"
                     : "bg-[#262626] text-muted/30 cursor-not-allowed"
                     }`}
                 >
@@ -781,7 +797,7 @@ function DreamJournalContent() {
                   ) : (
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
                   )}
-                </button>
+                </motion.button>
               </div>
             </div>
           </div>
