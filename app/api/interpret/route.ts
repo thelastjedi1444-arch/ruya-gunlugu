@@ -13,7 +13,7 @@ export async function POST(req: Request) {
         );
     }
 
-    const { text, language } = await req.json();
+    const { text, language, zodiacSign } = await req.json();
     if (!text) {
         return NextResponse.json(
             { error: "Dream text is required" },
@@ -33,6 +33,7 @@ export async function POST(req: Request) {
       - Use suitable emojis throughout the text to match the mood.
       - Don't just append them at the end, integrate naturally.
       - Start directly with the interpretation.
+      ${zodiacSign ? `Kullanıcının burcu ${zodiacSign}. Yorumu bu burcun astrolojik karakterini (su, toprak, ateş, hava elementleri vb.) dikkate alarak yap.` : ""}
       Output: A single paragraph ${isEnglish ? "interpretation of the following dream" : "rüya yorumu"}. Do not use any titles or markdown headings.
       
       Dream: "${text}"

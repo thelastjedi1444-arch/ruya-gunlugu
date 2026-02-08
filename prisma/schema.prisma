@@ -15,6 +15,7 @@ model User {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  zodiacSign String?
   dreams    Dream[]
 }
 

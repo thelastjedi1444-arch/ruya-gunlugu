@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { registerUser, loginUser, User } from "@/lib/storage";
 import { useLanguage } from "@/hooks/use-language";
+import ZodiacWheel from "./ZodiacWheel";
 
 interface AuthModalProps {
     isOpen: boolean;
@@ -15,6 +16,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [zodiacSign, setZodiacSign] = useState<string | undefined>(undefined);
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [mode, setMode] = useState<"login" | "register">("login");
@@ -47,7 +49,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 if (password !== confirmPassword) {
                     throw new Error(t("passwordsDoNotMatch") as string);
                 }
-                user = registerUser(trimmedUsername);
+                user = registerUser(trimmedUsername, zodiacSign);
             } else {
                 // For demo purposes, we don't check password since we process it locally without hashing
                 // In a real app, you MUST hash passwords
@@ -95,7 +97,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.95, opacity: 0, y: 20 }}
                         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                        className="bg-[#1a1a1a] border border-white/10 rounded-2xl w-full max-w-sm shadow-2xl shadow-black/50 overflow-hidden"
+                        className={`bg-[#1a1a1a] border border-white/10 rounded-2xl w-full ${mode === "register" ? "max-w-4xl" : "max-w-sm"} shadow-2xl shadow-black/50 overflow-hidden transition-all duration-500`}
                     >
                         {/* Header */}
                         <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
@@ -149,6 +151,16 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                         onChange={(e) => setConfirmPassword(e.target.value)}
                                         placeholder={t("confirmPasswordPlaceholder") as string}
                                         className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-white/30 transition-colors"
+                                    />
+                                </div>
+                            )}
+
+                            {/* Zodiac Wheel for Registration */}
+                            {mode === "register" && (
+                                <div className="border-t border-white/10 pt-6">
+                                    <ZodiacWheel
+                                        selectedSign={zodiacSign}
+                                        onSelect={setZodiacSign}
                                     />
                                 </div>
                             )}

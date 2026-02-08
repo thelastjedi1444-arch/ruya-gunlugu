@@ -16,7 +16,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/hooks/use-language";
 import LanguageToggle from "@/components/LanguageToggle";
 import FeedbackModal from "@/components/FeedbackModal";
-import { deleteDream as deleteDreamStorage } from "@/lib/storage";
+import { deleteDream as deleteDreamStorage, updateUser } from "@/lib/storage";
+import ZodiacWheel from "@/components/ZodiacWheel";
 
 function DreamJournalContent() {
   const searchParams = useSearchParams();
@@ -32,6 +33,9 @@ function DreamJournalContent() {
   const [dreamId, setDreamId] = useState<string | null>(null);
   const inputContainerRef = useRef<HTMLDivElement>(null);
   const [viewportHeight, setViewportHeight] = useState('100vh');
+  const [showZodiacPrompt, setShowZodiacPrompt] = useState(false);
+  const [promptZodiacSign, setPromptZodiacSign] = useState<string | undefined>(undefined);
+  const [hasDismissedZodiac, setHasDismissedZodiac] = useState(false);
 
   // Auth State
   const { user, loading: authLoading, logout } = useAuth();
@@ -177,6 +181,25 @@ function DreamJournalContent() {
     };
   }, [user]); // Re-run when user changes (login/logout)
 
+  // Check for missing Zodiac Sign
+  useEffect(() => {
+    if (user && !user.zodiacSign && !hasDismissedZodiac) {
+      // Simple delay to not be annoying immediately on load
+      const timer = setTimeout(() => setShowZodiacPrompt(true), 1500);
+      return () => clearTimeout(timer);
+    } else {
+      setShowZodiacPrompt(false);
+    }
+  }, [user, hasDismissedZodiac]);
+
+  const handleSaveZodiac = () => {
+    if (promptZodiacSign && user) {
+      updateUser(user.username, { zodiacSign: promptZodiacSign });
+      // No need to set show false manually as effect will handle it, but for instant UI feedback:
+      setShowZodiacPrompt(false);
+    }
+  };
+
   // Load dream if ID is present
   useEffect(() => {
     // If we're typing a new dream, ignore ID updates or lack of ID (don't wipe input)
@@ -291,7 +314,7 @@ function DreamJournalContent() {
       const res = await fetch("/api/interpret", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: activeDreamText, language }),
+        body: JSON.stringify({ text: activeDreamText, language, zodiacSign: user?.zodiacSign }),
       });
 
       const data = await res.json();
@@ -866,6 +889,59 @@ function DreamJournalContent() {
           </div>
         </div >
       </div >
+
+
+      {/* Zodiac Prompt Modal */}
+      <AnimatePresence>
+        {
+          showZodiacPrompt && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200] flex items-center justify-center p-4"
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="bg-[#1a1a1a] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl p-6 relative overflow-hidden"
+              >
+                <button
+                  onClick={() => {
+                    setHasDismissedZodiac(true);
+                    setShowZodiacPrompt(false);
+                  }}
+                  className="absolute top-4 right-4 text-white/50 hover:text-white"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                </button>
+
+                <h2 className="text-xl md:text-2xl font-light text-center text-white mb-6">
+                  Rüya yorumlarını kişiselleştirmek için burcunu seç!
+                </h2>
+
+                <div className="py-2">
+                  <ZodiacWheel
+                    selectedSign={promptZodiacSign}
+                    onSelect={setPromptZodiacSign}
+                  />
+                </div>
+
+                <div className="flex justify-center gap-4 mt-6">
+                  <button
+                    onClick={handleSaveZodiac}
+                    disabled={!promptZodiacSign}
+                    className="bg-white text-black px-8 py-2 rounded-full font-medium hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Kaydet
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )
+        }
+      </AnimatePresence >
     </>
   );
 }

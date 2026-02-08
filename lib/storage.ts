@@ -14,6 +14,7 @@ export interface User {
     id: string;
     username: string;
     createdAt: string;
+    zodiacSign?: string;
 }
 
 export interface Dream {
@@ -46,7 +47,7 @@ export const getUsers = (): User[] => {
     return stored ? JSON.parse(stored) : [];
 };
 
-export const registerUser = (username: string): User => {
+export const registerUser = (username: string, zodiacSign?: string): User => {
     const users = getUsers();
     if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
         throw new Error("Bu kullanıcı adı zaten alınmış.");
@@ -56,6 +57,7 @@ export const registerUser = (username: string): User => {
         id: generateId(),
         username,
         createdAt: new Date().toISOString(),
+        zodiacSign,
     };
 
     localStorage.setItem(USERS_KEY, JSON.stringify([...users, newUser]));
@@ -65,6 +67,31 @@ export const registerUser = (username: string): User => {
 export const loginUser = (username: string): User | null => {
     const users = getUsers();
     return users.find(u => u.username.toLowerCase() === username.toLowerCase()) || null;
+};
+
+export const updateUser = (username: string, updates: Partial<User>): User | null => {
+    const users = getUsers();
+    const index = users.findIndex(u => u.username.toLowerCase() === username.toLowerCase());
+    if (index === -1) return null;
+
+    const updatedUser = { ...users[index], ...updates };
+    users[index] = updatedUser;
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+
+    // Also update current session if it matches
+    // But we need to handle window check
+    if (typeof window !== "undefined") {
+        const currentUserStr = localStorage.getItem("user");
+        if (currentUserStr) {
+            const currentUser = JSON.parse(currentUserStr);
+            if (currentUser.username === username) {
+                localStorage.setItem("user", JSON.stringify(updatedUser));
+                window.dispatchEvent(new Event("auth-change"));
+            }
+        }
+    }
+
+    return updatedUser;
 };
 
 // Dream Management
