@@ -4,8 +4,8 @@ import { motion } from "framer-motion";
 import { useLanguage } from "@/hooks/use-language";
 
 interface BottomTabBarProps {
-    activeTab: "calendar" | "journal" | "stats" | "settings";
-    onTabChange: (tab: "calendar" | "journal" | "stats" | "settings") => void;
+    activeTab: "calendar" | "journal" | "interpret";
+    onTabChange: (tab: "calendar" | "journal" | "interpret") => void;
     onNewDream: () => void;
 }
 
@@ -13,10 +13,9 @@ export default function BottomTabBar({ activeTab, onTabChange, onNewDream }: Bot
     const { t } = useLanguage();
 
     const tabs = [
-        { id: "calendar" as const, icon: CalendarIcon, label: t("calendar") || "Calendar" },
         { id: "journal" as const, icon: JournalIcon, label: t("journal") || "Journal" },
-        { id: "stats" as const, icon: StatsIcon, label: t("stats") || "Stats" },
-        { id: "settings" as const, icon: SettingsIcon, label: t("settings") || "Settings" },
+        { id: "calendar" as const, icon: CalendarIcon, label: t("calendar") || "Calendar" },
+        { id: "interpret" as const, icon: SparklesIcon, label: t("interpretation") || "Interpret" },
     ];
 
     return (
@@ -24,39 +23,44 @@ export default function BottomTabBar({ activeTab, onTabChange, onNewDream }: Bot
             {/* Background blur + gradient - BUILD_v1.1 */}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/95 to-transparent backdrop-blur-xl" />
 
-            <div className="relative flex items-end justify-around px-4 pb-[env(safe-area-inset-bottom,8px)] pt-2">
-                {/* Left tabs */}
-                {tabs.slice(0, 2).map((tab) => (
-                    <TabButton
-                        key={tab.id}
-                        icon={tab.icon}
-                        label={tab.label as string}
-                        isActive={activeTab === tab.id}
-                        onClick={() => onTabChange(tab.id)}
-                    />
-                ))}
+            <div className="relative flex items-end justify-between px-6 pb-[env(safe-area-inset-bottom,8px)] pt-2">
+                {/* Journal */}
+                <TabButton
+                    icon={tabs[0].icon}
+                    label={tabs[0].label as string}
+                    isActive={activeTab === tabs[0].id}
+                    onClick={() => onTabChange(tabs[0].id)}
+                />
 
-                {/* Center FAB */}
+                {/* Calendar */}
+                <TabButton
+                    icon={tabs[1].icon}
+                    label={tabs[1].label as string}
+                    isActive={activeTab === tabs[1].id}
+                    onClick={() => onTabChange(tabs[1].id)}
+                />
+
+                {/* New Dream FAB - Center */}
                 <motion.button
                     whileTap={{ scale: 0.9 }}
                     onClick={onNewDream}
-                    className="relative -top-4 w-14 h-14 bg-blue-500 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/30"
+                    className="relative -top-5 w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.4)] border border-white/10"
                 >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
                         <path d="M12 5v14M5 12h14" />
                     </svg>
                 </motion.button>
 
-                {/* Right tabs */}
-                {tabs.slice(2).map((tab) => (
-                    <TabButton
-                        key={tab.id}
-                        icon={tab.icon}
-                        label={tab.label as string}
-                        isActive={activeTab === tab.id}
-                        onClick={() => onTabChange(tab.id)}
-                    />
-                ))}
+                {/* Interpret */}
+                <TabButton
+                    icon={tabs[2].icon}
+                    label={tabs[2].label as string}
+                    isActive={activeTab === tabs[2].id}
+                    onClick={() => onTabChange(tabs[2].id)}
+                />
+
+                {/* Empty slot for balance if needed, or just 3 tabs + FAB */}
+                <div className="w-12" />
             </div>
         </div>
     );
@@ -77,7 +81,7 @@ function TabButton({
         <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={onClick}
-            className="flex flex-col items-center gap-1 py-2 px-4"
+            className="flex flex-col items-center gap-1 py-2 px-2 min-w-[64px]"
         >
             <Icon className={`w-6 h-6 transition-colors ${isActive ? "text-blue-500" : "text-white/40"}`} />
             <span className={`text-[10px] uppercase tracking-wider font-medium transition-colors ${isActive ? "text-blue-500" : "text-white/40"}`}>
@@ -106,19 +110,10 @@ function JournalIcon({ className }: { className?: string }) {
     );
 }
 
-function StatsIcon({ className }: { className?: string }) {
+function SparklesIcon({ className }: { className?: string }) {
     return (
         <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M18 20V10M12 20V4M6 20v-6" />
-        </svg>
-    );
-}
-
-function SettingsIcon({ className }: { className?: string }) {
-    return (
-        <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="3" />
-            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
+            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
         </svg>
     );
 }
