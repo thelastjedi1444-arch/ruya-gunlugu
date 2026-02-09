@@ -267,49 +267,48 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
                             {/* Zodiac Wheel for Registration */}
                             {mode === "register" && (
-                                <div className="border-t border-white/10 pt-6">
-                                    <ZodiacWheel
-                                        selectedSign={zodiacSign}
-                                        onSelect={setZodiacSign}
-                                        t={t}
-                                    />
+                                <div className="border-t border-white/5 pt-4">
+                                    <div className="flex flex-col gap-1 mb-4">
+                                        <span className="text-xs text-white/40 font-medium uppercase tracking-wider">{t("zodiacSign") as string} (Opsiyonel)</span>
+                                        <p className="text-[10px] text-white/20 leading-tight">
+                                            {t("zodiacInstruction") as string}
+                                        </p>
+                                    </div>
+                                    <div className="scale-90 md:scale-100 origin-top">
+                                        <ZodiacWheel
+                                            selectedSign={zodiacSign}
+                                            onSelect={setZodiacSign}
+                                            t={t}
+                                        />
+                                    </div>
                                 </div>
                             )}
 
-                            {/* Error Message */}
-                            {error && (
-                                <motion.p
-                                    initial={{ opacity: 0, y: -5 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    className="text-red-400 text-sm text-center"
-                                >
-                                    {error}
-                                </motion.p>
-                            )}
-
                             {/* Submit Button */}
-                            <button
-                                type="submit"
-                                disabled={isLoading || isSuccess}
-                                className={`w-full font-medium py-3 rounded-xl transition-all duration-500 flex items-center justify-center gap-2 transform ${isSuccess ? "bg-green-500 text-white scale-[1.02]" : "bg-white text-black hover:bg-white/90"
-                                    } disabled:opacity-50 disabled:cursor-not-allowed`}
-                            >
-                                {isLoading && !isSuccess ? (
-                                    <>
-                                        <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                                        <span>{t("processing") as string}</span>
-                                    </>
-                                ) : isSuccess ? (
-                                    <div className="flex items-center gap-2">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                            <polyline points="20 6 9 17 4 12" />
-                                        </svg>
-                                        <span>Tamam!</span>
-                                    </div>
-                                ) : (
-                                    mode === "login" ? t("loginTitle") as string : t("registerTitle") as string
-                                )}
-                            </button>
+                            <div className={`pt-2 ${mode === "register" ? "sticky bottom-0 bg-[#1a1a1a] pb-2 -mx-1 px-1 shadow-[0_-20px_20px_rgba(26,26,26,0.8)]" : ""}`}>
+                                <button
+                                    type="submit"
+                                    disabled={isLoading || isSuccess}
+                                    className={`w-full font-medium py-3.5 rounded-xl transition-all duration-500 flex items-center justify-center gap-2 transform ${isSuccess ? "bg-green-500 text-white scale-[1.02]" : "bg-white text-black hover:bg-white/90 active:scale-[0.98]"
+                                        } disabled:opacity-50 disabled:cursor-not-allowed shadow-xl`}
+                                >
+                                    {isLoading && !isSuccess ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                                            <span>{t("processing") as string}</span>
+                                        </>
+                                    ) : isSuccess ? (
+                                        <div className="flex items-center gap-2">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                <polyline points="20 6 9 17 4 12" />
+                                            </svg>
+                                            <span>{t("registerSuccess") ? "Tamam!" : "Done!"}</span>
+                                        </div>
+                                    ) : (
+                                        mode === "login" ? t("loginTitle") as string : t("registerTitle") as string
+                                    )}
+                                </button>
+                            </div>
 
                             {/* Toggle Mode */}
                             <div className="text-center">

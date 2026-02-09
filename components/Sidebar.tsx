@@ -115,6 +115,7 @@ export default function Sidebar({ isOpen, dreams, onSelectDream, onDeleteDream, 
                         {/* Header */}
                         <div className="flex justify-between items-center mb-5 px-1">
                             <motion.span
+                                key={language} // Force re-render on language change
                                 initial={{ opacity: 0, x: -10 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.1 }}
@@ -131,7 +132,7 @@ export default function Sidebar({ isOpen, dreams, onSelectDream, onDeleteDream, 
                         <div className="grid grid-cols-7 gap-2 text-center mb-3">
                             {weekDaysShort.map((day, i) => (
                                 <motion.div
-                                    key={day}
+                                    key={`${language}-${day}-${i}`}
                                     initial={{ opacity: 0, y: -5 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.15 + i * 0.02 }}

@@ -45,6 +45,11 @@ export async function POST(req: Request) {
 
         try {
             console.log(`Attempting request with key ending in ...${key.slice(-5)}`);
+
+            // Add a timeout to the fetch request
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
             const response = await fetch(API_URL, {
                 method: "POST",
                 headers: {
@@ -53,7 +58,8 @@ export async function POST(req: Request) {
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: prompt }] }],
                 }),
-            });
+                signal: controller.signal
+            }).finally(() => clearTimeout(timeoutId));
 
             if (response.ok) {
                 const data = await response.json();

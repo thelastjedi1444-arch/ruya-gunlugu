@@ -1,4 +1,6 @@
 "use client";
+// Trigger build to fix Vercel clone error - 2026-02-09
+
 
 import { useState, useEffect, Suspense, useRef, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -19,6 +21,7 @@ import FeedbackModal from "@/components/FeedbackModal";
 import UserProfileModal from "@/components/UserProfileModal";
 import { deleteDream as deleteDreamStorage, updateUser } from "@/lib/storage";
 import ZodiacWheel from "@/components/ZodiacWheel";
+import { MobileAppView } from "@/components/mobile";
 
 function DreamJournalContent() {
   const searchParams = useSearchParams();
@@ -365,7 +368,7 @@ function DreamJournalContent() {
     }
   };
 
-  const handleWeeklyAnalysis = async () => {
+  const handleWeeklyAnalysis = useCallback(async () => {
     setShowWeeklyAnalysis(true);
     setWeeklyAnalysisText(t("gatheringWhispers") as string);
 
@@ -378,7 +381,7 @@ function DreamJournalContent() {
       console.error("Weekly analysis error:", error);
       setWeeklyAnalysisText(t("analysisError") as string);
     }
-  };
+  }, [dreams, language, t]);
 
   // Update Weekly Analysis content when language changes while it's open
   useEffect(() => {
@@ -600,7 +603,35 @@ function DreamJournalContent() {
         />
       )}
 
-      <div className="flex w-full min-h-screen relative pt-16">
+      {/* Mobile App View - Rendered only on mobile */}
+      <MobileAppView
+        dreams={dreams}
+        onNewDream={(dream) => {
+          if (dream.text.trim()) {
+            setDream(dream.text);
+            handleSave();
+          }
+        }}
+        onDreamClick={(selectedDream) => {
+          // Load dream into view
+          setDream(selectedDream.text);
+          setDreamId(selectedDream.id);
+          setActiveDreamText(selectedDream.text);
+          if (selectedDream.interpretation) {
+            setInterpretation(selectedDream.interpretation);
+            setStatus("interpreted");
+          } else {
+            setStatus("saved");
+          }
+        }}
+        onShowAuthModal={() => setShowAuthModal(true)}
+        isListening={isListening}
+        onToggleListening={toggleListening}
+        transcript={dream}
+      />
+
+      {/* Desktop Layout - Hidden on mobile */}
+      <div className="hidden md:flex w-full min-h-screen relative pt-16">
         {/* Auth Button & Language Toggle */}
         <div className="fixed top-4 right-4 z-[60] flex items-center gap-3">
           <button
@@ -626,10 +657,10 @@ function DreamJournalContent() {
               </span>
               <button
                 onClick={logout}
-                className="text-xs text-white/50 hover:text-white transition-colors ml-2"
+                className="p-2 -mr-1 text-white/50 hover:text-white transition-colors ml-1 active:scale-90"
                 title={t("logout") as string}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                   <polyline points="16 17 21 12 16 7" />
                   <line x1="21" x2="9" y1="12" y2="12" />
