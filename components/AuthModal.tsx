@@ -20,7 +20,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const [mode, setMode] = useState<"login" | "register">("login");
 
     // Real-time validation states
-    const [usernameStatus, setUsernameStatus] = useState<"idle" | "checking" | "available" | "taken">("idle");
+    const [usernameStatus, setUsernameStatus] = useState<"idle" | "checking" | "available" | "taken" | "error">("idle");
     const [passwordsMatch, setPasswordsMatch] = useState(false);
 
     // Debounced username check
@@ -31,13 +31,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 try {
                     const res = await fetch(`/api/auth/check-username?username=${encodeURIComponent(username.trim())}`);
                     if (!res.ok) {
-                        setUsernameStatus("idle");
+                        setUsernameStatus("error");
                         return;
                     }
                     const data = await res.json();
                     setUsernameStatus(data.available ? "available" : "taken");
                 } catch (err) {
-                    setUsernameStatus("idle");
+                    setUsernameStatus("error");
                 }
             }, 500);
             return () => clearTimeout(timer);
@@ -180,7 +180,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                     <span>{t("username") as string}</span>
                                     {mode === "register" && usernameStatus !== "idle" && (
                                         <span className={`text-[10px] uppercase tracking-wider font-bold ${usernameStatus === "checking" ? "text-white/40" :
-                                            usernameStatus === "available" ? "text-green-400" : "text-red-400"
+                                                usernameStatus === "available" ? "text-green-400" :
+                                                    "text-red-400"
                                             }`}>
                                             {usernameStatus === "checking" ? "..." :
                                                 usernameStatus === "available" ? t("usernameAvailable") :
@@ -196,7 +197,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                         placeholder={t("usernamePlaceholder") as string}
                                         className={`w-full bg-[#0f0f0f] border rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none transition-all duration-300 ${isSuccess ? "border-green-500/50 bg-green-500/5" :
                                             mode === "register" && usernameStatus === "available" ? "border-green-500/30" :
-                                                mode === "register" && usernameStatus === "taken" ? "border-red-500/30" : "border-white/10"
+                                                mode === "register" && (usernameStatus === "taken" || usernameStatus === "error") ? "border-red-500/30" : "border-white/10"
                                             }`}
                                     />
                                     {mode === "register" && usernameStatus === "available" && (
