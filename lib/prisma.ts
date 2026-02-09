@@ -4,26 +4,19 @@ declare global {
     var __prismaClient: PrismaClient | undefined
 }
 
-let prismaInstance: PrismaClient | undefined
-
-function getPrismaClient() {
-    if (!prismaInstance) {
-        if (global.__prismaClient) {
-            prismaInstance = global.__prismaClient
-        } else {
-            prismaInstance = new PrismaClient()
-            if (process.env.NODE_ENV !== 'production') {
-                global.__prismaClient = prismaInstance
-            }
-        }
+const getPrisma = () => {
+    if (process.env.NODE_ENV === 'production') {
+        return new PrismaClient()
     }
-    return prismaInstance
+    if (!global.__prismaClient) {
+        global.__prismaClient = new PrismaClient()
+    }
+    return global.__prismaClient
 }
 
-// Export a Proxy that lazily initializes Prisma
 export const prisma = new Proxy({} as PrismaClient, {
     get: (target, prop) => {
-        const client = getPrismaClient()
+        const client = getPrisma()
         return (client as any)[prop]
     }
 })
