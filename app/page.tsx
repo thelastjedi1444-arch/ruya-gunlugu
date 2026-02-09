@@ -24,6 +24,10 @@ import ZodiacWheel from "@/components/ZodiacWheel";
 import { MobileAppView } from "@/components/mobile";
 
 function DreamJournalContent() {
+  useEffect(() => {
+    console.log("MOBILE_REDESIGN_VERSION: v1.1 - Clean History Force Push");
+  }, []);
+
   const searchParams = useSearchParams();
   const router = useRouter();
   const id = searchParams.get("id");

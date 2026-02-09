@@ -21,7 +21,7 @@ export default function BottomTabBar({ activeTab, onTabChange, onNewDream }: Bot
 
     return (
         <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
-            {/* Background blur + gradient */}
+            {/* Background blur + gradient - BUILD_v1.1 */}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/95 to-transparent backdrop-blur-xl" />
 
             <div className="relative flex items-end justify-around px-4 pb-[env(safe-area-inset-bottom,8px)] pt-2">
