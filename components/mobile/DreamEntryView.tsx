@@ -14,6 +14,8 @@ interface DreamEntryViewProps {
     onSave: (dream: { text: string; mood?: DreamMood }) => void;
     initialText?: string;
     initialMood?: DreamMood;
+    isListening: boolean;
+    onToggleListening: () => void;
 }
 
 export default function DreamEntryView({
@@ -22,6 +24,8 @@ export default function DreamEntryView({
     onSave,
     initialText = "",
     initialMood,
+    isListening,
+    onToggleListening,
 }: DreamEntryViewProps) {
     const { t, language } = useLanguage();
     const [text, setText] = useState(initialText);
@@ -124,20 +128,28 @@ export default function DreamEntryView({
                                         <path d="M21 15l-5-5L5 21" />
                                     </svg>
                                 </button>
-                                <button className="p-2 text-white/30 hover:text-white/60 transition-colors">
-                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" />
-                                        <path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <span className="text-xs text-white/30 uppercase tracking-wider">
-                                {wordCount} {t("words") || "WORDS"}
-                            </span>
-                        </div>
+                        <button
+                            onClick={onToggleListening}
+                            className={`p-2 transition-colors relative ${isListening ? "text-red-500 hover:text-red-400" : "text-white/30 hover:text-white/60"
+                                }`}
+                        >
+                            {isListening && (
+                                <span className="absolute inset-0 rounded-full animate-ping bg-red-500/20" />
+                            )}
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill={isListening ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" />
+                                <path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" />
+                            </svg>
+                        </button>
                     </div>
-                </motion.div>
-            )}
-        </AnimatePresence>
+                    <span className="text-xs text-white/30 uppercase tracking-wider">
+                        {wordCount} {t("words") || "WORDS"}
+                    </span>
+                </div>
+                    </div>
+                </motion.div >
+            )
+}
+        </AnimatePresence >
     );
 }

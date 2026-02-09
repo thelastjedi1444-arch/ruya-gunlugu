@@ -19,6 +19,9 @@ interface MobileAppViewProps {
     onNewDream: (dream: { text: string; mood?: DreamMood }) => void;
     onDreamClick: (dream: Dream) => void;
     onShowAuthModal: () => void;
+    isListening: boolean;
+    onToggleListening: () => void;
+    transcript: string;
 }
 
 export default function MobileAppView({
@@ -26,6 +29,9 @@ export default function MobileAppView({
     onNewDream,
     onDreamClick,
     onShowAuthModal,
+    isListening,
+    onToggleListening,
+    transcript,
 }: MobileAppViewProps) {
     const { t, language } = useLanguage();
     const { user } = useAuth();
@@ -209,6 +215,9 @@ export default function MobileAppView({
                 isOpen={showEntryView}
                 onClose={() => setShowEntryView(false)}
                 onSave={handleSaveDream}
+                isListening={isListening}
+                onToggleListening={onToggleListening}
+                initialText={transcript}
             />
         </div>
     );

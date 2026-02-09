@@ -623,6 +623,9 @@ function DreamJournalContent() {
           }
         }}
         onShowAuthModal={() => setShowAuthModal(true)}
+        isListening={isListening}
+        onToggleListening={toggleListening}
+        transcript={dream}
       />
 
       {/* Desktop Layout - Hidden on mobile */}
