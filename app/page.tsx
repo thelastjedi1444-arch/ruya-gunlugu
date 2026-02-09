@@ -37,6 +37,7 @@ function DreamJournalContent() {
   const [showZodiacPrompt, setShowZodiacPrompt] = useState(false);
   const [promptZodiacSign, setPromptZodiacSign] = useState<string | undefined>(undefined);
   const [hasDismissedZodiac, setHasDismissedZodiac] = useState(false);
+  const [interpretError, setInterpretError] = useState<string | null>(null);
 
   // Auth State
   const { user, loading: authLoading, logout } = useAuth();
@@ -314,6 +315,12 @@ function DreamJournalContent() {
   };
 
   const handleInterpret = async () => {
+    if (!activeDreamText) {
+      setInterpretError(language === 'tr' ? 'Yorumlanacak rüya bulunamadı.' : 'No dream text found to interpret.');
+      return;
+    }
+
+    setInterpretError(null);
     setStatus("interpreting");
     try {
       const res = await fetch("/api/interpret", {
@@ -323,6 +330,11 @@ function DreamJournalContent() {
       });
 
       const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || `API Error: ${res.status}`);
+      }
+
       if (data.interpretation) {
         setInterpretation(data.interpretation);
         setStatus("interpreted");
@@ -330,9 +342,13 @@ function DreamJournalContent() {
         if (dreamId) {
           updateDream(dreamId, { interpretation: data.interpretation });
         }
+      } else {
+        throw new Error(language === 'tr' ? 'Yorum oluşturulamadı.' : 'Failed to generate interpretation.');
       }
     } catch (error) {
       console.error("Interpretation failed", error);
+      const errorMessage = error instanceof Error ? error.message : (language === 'tr' ? 'Bilinmeyen bir hata oluştu.' : 'An unknown error occurred.');
+      setInterpretError(errorMessage);
       setStatus("saved");
     }
   };
@@ -773,6 +789,16 @@ function DreamJournalContent() {
                       {t("interpretDream") as string}
                     </span>
                   </motion.button>
+
+                  {interpretError && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-4 px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm text-center max-w-md"
+                    >
+                      {interpretError}
+                    </motion.div>
+                  )}
                 </motion.div>
               )}
 
