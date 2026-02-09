@@ -5,16 +5,11 @@ declare global {
 }
 
 const getPrisma = () => {
-    const url = process.env.DATABASE_URL
-    if (!url) {
-        throw new Error('DATABASE_URL environment variable is not set')
-    }
-
     if (process.env.NODE_ENV === 'production') {
-        return new PrismaClient({ datasourceUrl: url } as any)
+        return new PrismaClient()
     }
     if (!global.__prismaClient) {
-        global.__prismaClient = new PrismaClient({ datasourceUrl: url } as any)
+        global.__prismaClient = new PrismaClient()
     }
     return global.__prismaClient
 }
