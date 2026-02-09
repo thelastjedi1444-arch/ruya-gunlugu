@@ -180,8 +180,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                     <span>{t("username") as string}</span>
                                     {mode === "register" && usernameStatus !== "idle" && (
                                         <span className={`text-[10px] uppercase tracking-wider font-bold ${usernameStatus === "checking" ? "text-white/40" :
-                                                usernameStatus === "available" ? "text-green-400" :
-                                                    "text-red-400"
+                                            usernameStatus === "available" ? "text-green-400" :
+                                                "text-red-400"
                                             }`}>
                                             {usernameStatus === "checking" ? "..." :
                                                 usernameStatus === "available" ? t("usernameAvailable") :
@@ -208,6 +208,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                         </div>
                                     )}
                                 </div>
+                                {/* Helper text for taken username */}
+                                {mode === "register" && usernameStatus === "taken" && (
+                                    <p className="text-xs text-red-400 mt-1 flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-300">
+                                        <span className="inline-block w-1 h-1 rounded-full bg-red-400" />
+                                        {t("usernameTakenMessage") as string || "Bu kullanıcı adı başkası tarafından kullanılıyor. Lütfen farklı bir ad seçin."}
+                                    </p>
+                                )}
                             </div>
 
                             {/* Password */}
