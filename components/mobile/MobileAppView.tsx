@@ -9,9 +9,11 @@ import { useAuth } from "@/hooks/use-auth";
 import { Dream } from "@/lib/storage";
 import { BottomTabBar } from "./index";
 import MobileHeader from "./MobileHeader";
+import MobileSidebar from "./MobileSidebar";
 import MobileCalendar from "./MobileCalendar";
 import DreamListItem from "./DreamListItem";
 import DreamEntryView from "./DreamEntryView";
+import DreamDetailView from "./DreamDetailView";
 import { DreamMood } from "./MoodSelector";
 
 interface MobileAppViewProps {
@@ -37,29 +39,28 @@ export default function MobileAppView({
     const { user } = useAuth();
     const [activeTab, setActiveTab] = useState<"calendar" | "journal" | "stats" | "settings">("journal");
     const [showEntryView, setShowEntryView] = useState(false);
+    const [selectedDream, setSelectedDream] = useState<Dream | null>(null);
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
     const [showSidebar, setShowSidebar] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
     const dateLocale = language === "tr" ? tr : enUS;
-
-    // Get dream dates for calendar
-    const dreamDates = useMemo(() => {
-        return dreams.map(d => parseISO(d.date));
-    }, [dreams]);
 
     // Filter dreams for selected date or current month
     const filteredDreams = useMemo(() => {
-        return dreams.sort((a, b) =>
+        let filtered = dreams;
+
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            filtered = dreams.filter(d =>
+                d.text.toLowerCase().includes(query) ||
+                (d.title && d.title.toLowerCase().includes(query))
+            );
+        }
+
+        return filtered.sort((a, b) =>
             new Date(b.date).getTime() - new Date(a.date).getTime()
         );
-    }, [dreams]);
-
-    const monthDreamCount = useMemo(() => {
-        const now = new Date();
-        return dreams.filter(d => {
-            const date = parseISO(d.date);
-            return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-        }).length;
-    }, [dreams]);
+    }, [dreams, searchQuery]);
 
     const handleNewDream = () => {
         if (!user) {
@@ -74,17 +75,63 @@ export default function MobileAppView({
         setShowEntryView(false);
     };
 
+    const handleSaveAndInterpret = async (dream: { text: string; mood?: DreamMood }) => {
+        // Save first
+        onNewDream(dream);
+        setShowEntryView(false);
+
+        // Interpretation logic will be triggered by Detail view or automatically if we had more control 
+        // since we don't return the new ID immediately from onNewDream.
+        // For now, let's just save and the user can interpret in detail.
+    };
+
+    const handleDreamClick = (dream: Dream) => {
+        setSelectedDream(dream);
+    };
+
+    const handleInterpretDream = async (dreamId: string) => {
+        try {
+            const dream = dreams.find(d => d.id === dreamId);
+            if (!dream) return;
+
+            const response = await fetch("/api/interpret", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    text: dream.text,
+                    dreamId: dream.id,
+                    language
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                // Persist locally
+                const storage = await import("@/lib/storage");
+                storage.updateDream(dreamId, { interpretation: data.interpretation });
+                window.dispatchEvent(new Event("dream-saved")); // Trigger refresh in parent
+            }
+        } catch (error) {
+            console.error("Interpretation failed", error);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-black md:hidden flex flex-col">
             {/* Header */}
             <MobileHeader
-                title={t("journal") as string || "Dreams"}
                 onMenuClick={() => setShowSidebar(true)}
-                onSearchClick={() => { }}
+                onSearchClick={(query) => setSearchQuery(query)}
+            />
+
+            {/* Sidebar */}
+            <MobileSidebar
+                isOpen={showSidebar}
+                onClose={() => setShowSidebar(false)}
             />
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto pt-[calc(env(safe-area-inset-top,12px)+56px)] pb-24 px-4">
+            <main className="flex-1 overflow-y-auto pt-[calc(env(safe-area-inset-top,12px)+56px)] pb-24 px-4 overflow-x-hidden">
                 <AnimatePresence mode="wait">
                     {activeTab === "calendar" && (
                         <motion.div
@@ -92,39 +139,12 @@ export default function MobileAppView({
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 20 }}
-                            className="space-y-6"
+                            className="h-[calc(100vh-160px)]"
                         >
                             <MobileCalendar
-                                dreamDates={dreamDates}
-                                selectedDate={selectedDate}
-                                onDateSelect={setSelectedDate}
+                                dreams={dreams}
+                                onDreamClick={handleDreamClick}
                             />
-
-                            {/* Dreams This Month */}
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-[10px] text-white/40 uppercase tracking-widest font-semibold">
-                                        {t("dreamsThisMonthTitle") || "DREAMS THIS MONTH"}
-                                    </span>
-                                    <span className="text-xs text-blue-400">
-                                        {monthDreamCount} {t("entries") || "Entries"}
-                                    </span>
-                                </div>
-
-                                <div className="space-y-3">
-                                    {filteredDreams.slice(0, 5).map((dream) => (
-                                        <DreamListItem
-                                            key={dream.id}
-                                            id={dream.id}
-                                            title={dream.title || (t("untitledDream") as string)}
-                                            preview={dream.text.slice(0, 100)}
-                                            date={dream.date}
-                                            hasInterpretation={!!dream.interpretation}
-                                            onClick={() => onDreamClick(dream)}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
                         </motion.div>
                     )}
 
@@ -137,17 +157,17 @@ export default function MobileAppView({
                             className="space-y-6"
                         >
                             {/* Welcome Section */}
-                            {user && (
+                            {user && !searchQuery && (
                                 <div className="mb-4">
-                                    <p className="text-white/40 text-sm">{t("welcomeUser")},</p>
-                                    <h2 className="text-xl font-semibold text-white">{user.username}</h2>
+                                    <p className="text-white/40 text-xs uppercase tracking-widest">{t("welcomeUser")}</p>
+                                    <h2 className="text-2xl font-bold text-white">{user.username}</h2>
                                 </div>
                             )}
 
                             {/* Dream List */}
                             <div className="space-y-4">
                                 <span className="text-[10px] text-white/40 uppercase tracking-widest font-semibold">
-                                    {t("recentDreams")}
+                                    {searchQuery ? `${filteredDreams.length} ${t("entries")}` : t("recentDreams")}
                                 </span>
 
                                 {filteredDreams.length === 0 ? (
@@ -163,8 +183,9 @@ export default function MobileAppView({
                                                 title={dream.title || (t("untitledDream") as string)}
                                                 preview={dream.text.slice(0, 100)}
                                                 date={dream.date}
+                                                mood={dream.mood as any}
                                                 hasInterpretation={!!dream.interpretation}
-                                                onClick={() => onDreamClick(dream)}
+                                                onClick={() => handleDreamClick(dream)}
                                             />
                                         ))}
                                     </div>
@@ -181,8 +202,9 @@ export default function MobileAppView({
                             exit={{ opacity: 0, x: 20 }}
                             className="space-y-6"
                         >
-                            <div className="text-center py-12">
-                                <p className="text-white/30 text-sm">{t("stats")} - Coming soon</p>
+                            <div className="bg-[#111] rounded-2xl p-8 border border-white/5 text-center">
+                                <h3 className="text-white/40 text-sm uppercase tracking-widest mb-2">{t("stats")}</h3>
+                                <p className="text-white/20 text-xs italic">Personal analytics coming soon...</p>
                             </div>
                         </motion.div>
                     )}
@@ -195,8 +217,78 @@ export default function MobileAppView({
                             exit={{ opacity: 0, x: 20 }}
                             className="space-y-6"
                         >
-                            <div className="text-center py-12">
-                                <p className="text-white/30 text-sm">{t("settings")} - Coming soon</p>
+                            <div className="space-y-4">
+                                <h2 className="text-xl font-bold text-white px-2">
+                                    {t("settings") || "Settings"}
+                                </h2>
+
+                                {/* Profile Section */}
+                                <div className="bg-[#111] rounded-2xl p-6 border border-white/5">
+                                    <div className="flex items-center gap-4 mb-4">
+                                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xl font-bold text-white">
+                                            {user?.username.substring(0, 2).toUpperCase()}
+                                        </div>
+                                        <div>
+                                            <h3 className="text-white font-medium">{user?.username}</h3>
+                                            <p className="text-xs text-white/40">{t("joined")}: {new Date(user?.createdAt || Date.now()).toLocaleDateString()}</p>
+                                        </div>
+                                    </div>
+                                    {user?.zodiacSign && (
+                                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10">
+                                            <span className="text-xs text-white/70">
+                                                {(t("zodiacSigns") as any)?.[user.zodiacSign as any]?.name || user.zodiacSign}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Language Settings */}
+                                <div className="bg-[#111] rounded-2xl overflow-hidden border border-white/5">
+                                    <div className="p-4 border-b border-white/5">
+                                        <h3 className="text-sm font-medium text-white/60 uppercase tracking-widest">
+                                            Language / Dil
+                                        </h3>
+                                    </div>
+                                    <div className="divide-y divide-white/5">
+                                        <button
+                                            onClick={() => {
+                                                const event = new CustomEvent("language-change", { detail: "tr" });
+                                                window.dispatchEvent(event);
+                                                localStorage.setItem("language", "tr");
+                                            }}
+                                            className="w-full flex items-center justify-between px-6 py-4 hover:bg-white/5 transition-colors"
+                                        >
+                                            <span className={`text-base ${language === "tr" ? "text-white font-medium" : "text-white/60"}`}>Türkçe</span>
+                                            {language === "tr" && <span className="text-blue-500">✓</span>}
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                const event = new CustomEvent("language-change", { detail: "en" });
+                                                window.dispatchEvent(event);
+                                                localStorage.setItem("language", "en");
+                                            }}
+                                            className="w-full flex items-center justify-between px-6 py-4 hover:bg-white/5 transition-colors"
+                                        >
+                                            <span className={`text-base ${language === "en" ? "text-white font-medium" : "text-white/60"}`}>English</span>
+                                            {language === "en" && <span className="text-blue-500">✓</span>}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Sign Out */}
+                                <button
+                                    className="w-full flex items-center justify-center p-4 rounded-2xl bg-white/5 text-red-400 font-medium hover:bg-white/10 transition-colors"
+                                    onClick={async () => {
+                                        await fetch("/api/auth/logout", { method: "POST" });
+                                        window.location.href = "/login";
+                                    }}
+                                >
+                                    {t("logout")}
+                                </button>
+
+                                <p className="text-center text-xs text-white/10 pt-4 font-mono uppercase tracking-[0.2em]">
+                                    iDream v1.2 • Verified Stable
+                                </p>
                             </div>
                         </motion.div>
                     )}
@@ -210,15 +302,27 @@ export default function MobileAppView({
                 onNewDream={handleNewDream}
             />
 
-            {/* Dream Entry View */}
+            {/* Entry View Modal */}
             <DreamEntryView
                 isOpen={showEntryView}
                 onClose={() => setShowEntryView(false)}
                 onSave={handleSaveDream}
+                onSaveAndInterpret={handleSaveAndInterpret}
                 isListening={isListening}
                 onToggleListening={onToggleListening}
                 initialText={transcript}
             />
+
+            {/* Detail View Modal */}
+            <AnimatePresence>
+                {selectedDream && (
+                    <DreamDetailView
+                        dream={selectedDream}
+                        onClose={() => setSelectedDream(null)}
+                        onInterpret={handleInterpretDream}
+                    />
+                )}
+            </AnimatePresence>
         </div>
     );
 }

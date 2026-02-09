@@ -16,6 +16,7 @@ export interface User {
     username: string;
     createdAt: string;
     zodiacSign?: string;
+    role?: "ADMIN" | "USER";
 }
 
 export interface Dream {
@@ -24,6 +25,7 @@ export interface Dream {
     date: string;
     title?: string;
     interpretation?: string;
+    mood?: string;
     userId?: string; // Optional for backward compatibility with existing anon dreams
     username?: string; // To avoid constant lookups
 }
