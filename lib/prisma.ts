@@ -11,7 +11,13 @@ function getPrismaClient() {
         if (global.__prismaClient) {
             prismaInstance = global.__prismaClient
         } else {
-            prismaInstance = new PrismaClient()
+            prismaInstance = new PrismaClient({
+                datasources: {
+                    db: {
+                        url: process.env.DATABASE_URL
+                    }
+                }
+            })
             if (process.env.NODE_ENV !== 'production') {
                 global.__prismaClient = prismaInstance
             }
