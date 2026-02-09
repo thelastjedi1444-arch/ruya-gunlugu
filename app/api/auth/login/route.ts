@@ -19,10 +19,10 @@ export async function POST(req: Request) {
         const adminPassword = process.env.ADMIN_PASSWORD;
 
         if (username === adminUsername && password === adminPassword) {
-            const token = signToken({ userId: 'admin', username: adminUsername });
+            const token = signToken({ userId: 'admin', username: adminUsername, zodiacSign: 'Leo' });
             const response = NextResponse.json({
                 success: true,
-                user: { id: 'admin', username: adminUsername }
+                user: { id: 'admin', username: adminUsername, zodiacSign: 'Leo' }
             });
 
             response.cookies.set('auth_token', token, {
@@ -51,10 +51,10 @@ export async function POST(req: Request) {
         }
 
         // 3. Success (Database User)
-        const token = signToken({ userId: user.id, username: user.username });
+        const token = signToken({ userId: user.id, username: user.username, zodiacSign: user.zodiacSign });
         const response = NextResponse.json({
             success: true,
-            user: { id: user.id, username: user.username }
+            user: { id: user.id, username: user.username, zodiacSign: user.zodiacSign }
         });
 
         response.cookies.set('auth_token', token, {

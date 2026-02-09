@@ -9,7 +9,7 @@ import { cookies } from 'next/headers';
 
 export async function POST(req: Request) {
     try {
-        const { username, password } = await req.json();
+        const { username, password, zodiacSign } = await req.json();
 
         if (!username || !password) {
             return NextResponse.json({ error: 'Username and password required' }, { status: 400 });
@@ -29,14 +29,15 @@ export async function POST(req: Request) {
             data: {
                 username,
                 password: hashedPassword,
+                zodiacSign,
             },
         });
 
-        const token = signToken({ userId: user.id, username: user.username });
+        const token = signToken({ userId: user.id, username: user.username, zodiacSign: user.zodiacSign });
 
         const response = NextResponse.json({
             success: true,
-            user: { id: user.id, username: user.username }
+            user: { id: user.id, username: user.username, zodiacSign: user.zodiacSign }
         });
 
         response.cookies.set('auth_token', token, {

@@ -83,7 +83,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     body: JSON.stringify({
                         username: trimmedUsername,
                         password,
-                        zodiacSign
+                        zodiacSign: zodiacSign
                     }),
                 });
 
