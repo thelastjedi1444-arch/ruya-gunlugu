@@ -80,14 +80,14 @@ export default function DreamEntryView({
                                 iDream
                             </span>
 
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-3">
                                 <motion.button
                                     whileTap={{ scale: 0.95 }}
                                     onClick={() => onSaveAndInterpret?.({ text: text.trim(), mood })}
                                     disabled={!text.trim()}
-                                    className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1 ${!text.trim()
-                                        ? "bg-purple-900/10 text-white/20"
-                                        : "bg-purple-600 text-white shadow-[0_0_15px_rgba(168,85,247,0.4)]"
+                                    className={`px-4 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-1 ${!text.trim()
+                                        ? "bg-purple-900/20 text-white/20"
+                                        : "bg-purple-600 text-white shadow-[0_0_20px_rgba(168,85,247,0.5)] border border-purple-400/30"
                                         }`}
                                 >
                                     <span>{t("interpretDream")?.toString().split(" ")[0] || "Interpret"}</span>
@@ -97,9 +97,9 @@ export default function DreamEntryView({
                                     whileTap={{ scale: 0.95 }}
                                     onClick={handleSave}
                                     disabled={!text.trim()}
-                                    className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${!text.trim()
+                                    className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${!text.trim()
                                         ? "bg-white/10 text-white/30"
-                                        : "bg-white text-black"
+                                        : "bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.3)]"
                                         }`}
                                 >
                                     {t("save")}
@@ -112,7 +112,7 @@ export default function DreamEntryView({
                     <div className="flex-1 overflow-y-auto pt-[calc(env(safe-area-inset-top,12px)+56px)] pb-20 px-5">
                         {/* Date Display */}
                         <div className="mb-6">
-                            <p className="text-[10px] text-white/40 uppercase tracking-widest font-semibold mb-1">
+                            <p className="text-sm text-white/70 uppercase tracking-widest font-bold mb-1 ml-1 opacity-80">
                                 {format(new Date(), "MMMM yyyy", { locale: dateLocale }).toUpperCase()}
                             </p>
                             <h2 className="text-2xl font-bold text-white">
@@ -150,19 +150,6 @@ export default function DreamEntryView({
                     <div className="fixed bottom-0 left-0 right-0 bg-black border-t border-white/5">
                         <div className="flex items-center justify-between px-5 py-3 pb-[calc(env(safe-area-inset-bottom,8px)+12px)]">
                             <div className="flex items-center gap-4">
-                                <button className="p-2 text-white/30 hover:text-white/60 transition-colors">
-                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                        <polygon points="23 7 16 12 23 17 23 7" />
-                                        <rect x="1" y="5" width="15" height="14" rx="2" />
-                                    </svg>
-                                </button>
-                                <button className="p-2 text-white/30 hover:text-white/60 transition-colors">
-                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                        <rect x="3" y="3" width="18" height="18" rx="2" />
-                                        <circle cx="8.5" cy="8.5" r="1.5" />
-                                        <path d="M21 15l-5-5L5 21" />
-                                    </svg>
-                                </button>
                                 <button
                                     onClick={onToggleListening}
                                     className={`p-2 transition-colors relative ${isListening ? "text-red-500 hover:text-red-400" : "text-white/30 hover:text-white/60"

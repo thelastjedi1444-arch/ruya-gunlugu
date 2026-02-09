@@ -1,28 +1,20 @@
-"use client";
-
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/hooks/use-language";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 interface MobileSidebarProps {
     isOpen: boolean;
     onClose: () => void;
-    onNavigate: (tab: "journal" | "calendar" | "interpret") => void;
+    onNavigate: (tab: "journal" | "calendar" | "interpret" | "settings") => void;
 }
 
 export default function MobileSidebar({ isOpen, onClose, onNavigate }: MobileSidebarProps) {
-    const { t, language, setLanguage } = useLanguage();
+    const { t, language } = useLanguage();
     const { user, logout } = useAuth();
     const router = useRouter();
-    const [showSettings, setShowSettings] = useState(false);
-
-    // Theme logic
     const isTr = language === "tr";
-    const accentColor = isTr ? "text-red-500" : "text-blue-400";
     const hoverBg = isTr ? "hover:bg-red-500/10" : "hover:bg-blue-500/10";
-    const activeColor = isTr ? "text-red-500" : "text-blue-400";
 
     const handleLogout = async () => {
         await logout();
@@ -30,9 +22,6 @@ export default function MobileSidebar({ isOpen, onClose, onNavigate }: MobileSid
         router.push("/login"); // or just reload/reset state
     };
 
-    const handleLanguageChange = (lang: "tr" | "en") => {
-        setLanguage(lang);
-    };
 
     return (
         <AnimatePresence>
@@ -53,7 +42,7 @@ export default function MobileSidebar({ isOpen, onClose, onNavigate }: MobileSid
                         animate={{ x: 0 }}
                         exit={{ x: "-100%" }}
                         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                        className="fixed top-0 left-0 bottom-0 z-[70] w-[80%] max-w-sm bg-[#0a0a0a] border-r border-white/5 shadow-2xl flex flex-col"
+                        className="fixed top-0 left-0 bottom-0 z-[70] w-[80%] max-w-sm bg-[#000000] border-r border-white/5 shadow-2xl flex flex-col"
                     >
                         {/* User Profile Section */}
                         {user ? (
@@ -64,7 +53,7 @@ export default function MobileSidebar({ isOpen, onClose, onNavigate }: MobileSid
                                 <div>
                                     <h2 className="text-xl font-bold text-white mb-1">{user.username}</h2>
                                     <p className="text-xs text-white/40">
-                                        {t("joined")}: {new Date(user.createdAt || Date.now()).toLocaleDateString(language === "tr" ? "tr-TR" : "en-US")}
+                                        {t("joined")}: {user.createdAt ? new Date(user.createdAt).toLocaleDateString(language === "tr" ? "tr-TR" : "en-US") : "---"}
                                     </p>
                                 </div>
                             </div>
@@ -85,89 +74,41 @@ export default function MobileSidebar({ isOpen, onClose, onNavigate }: MobileSid
 
                         {/* Navigation Links */}
                         <div className="flex-1 py-6 px-4 space-y-1">
-                            {!showSettings ? (
-                                <>
-                                    <SidebarLink
-                                        icon={HomeIcon}
-                                        label={t("journal")}
-                                        onClick={() => onNavigate("journal")}
-                                        hoverBg={hoverBg}
-                                    />
-                                    <SidebarLink
-                                        icon={CalendarIcon}
-                                        label={t("calendar")}
-                                        onClick={() => onNavigate("calendar")}
-                                        hoverBg={hoverBg}
-                                    />
-                                    <SidebarLink
-                                        icon={SparklesIcon}
-                                        label={t("weeklyAnalysis")}
-                                        onClick={() => onNavigate("interpret")}
-                                        hoverBg={hoverBg}
-                                    />
-                                    <div className="h-px bg-white/5 my-2 mx-4" />
-                                    <SidebarLink
-                                        icon={SettingsIcon}
-                                        label={t("settings")}
-                                        onClick={() => setShowSettings(true)}
-                                        hoverBg={hoverBg}
-                                    />
-                                </>
-                            ) : (
-                                <motion.div
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    className="space-y-4"
-                                >
-                                    <button
-                                        onClick={() => setShowSettings(false)}
-                                        className="flex items-center gap-2 text-white/40 hover:text-white px-2 mb-4"
-                                    >
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <path d="M15 18l-6-6 6-6" />
-                                        </svg>
-                                        {t("backToHome")}
-                                    </button>
-
-                                    <div className="px-2">
-                                        <h3 className="text-xs font-bold text-white/30 uppercase tracking-widest mb-4">
-                                            {t("settings")}
-                                        </h3>
-
-                                        {/* Language */}
-                                        <div className="space-y-2 mb-6">
-                                            <label className="text-sm text-white/60 block mb-2">Language</label>
-                                            <div className="flex gap-2">
-                                                <button
-                                                    onClick={() => handleLanguageChange("tr")}
-                                                    className={`flex-1 py-3 rounded-lg text-sm font-medium transition-all ${isTr ? "bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]" : "bg-white/5 text-white/40 hover:bg-white/10"
-                                                        }`}
-                                                >
-                                                    Türkçe
-                                                </button>
-                                                <button
-                                                    onClick={() => handleLanguageChange("en")}
-                                                    className={`flex-1 py-3 rounded-lg text-sm font-medium transition-all ${!isTr ? "bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)]" : "bg-white/5 text-white/40 hover:bg-white/10"
-                                                        }`}
-                                                >
-                                                    English
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            )}
+                            <SidebarLink
+                                icon={HomeIcon}
+                                label={t("journal")}
+                                onClick={() => onNavigate("journal")}
+                                hoverBg={hoverBg}
+                            />
+                            <SidebarLink
+                                icon={CalendarIcon}
+                                label={t("calendar")}
+                                onClick={() => onNavigate("calendar")}
+                                hoverBg={hoverBg}
+                            />
+                            <SidebarLink
+                                icon={SparklesIcon}
+                                label={t("weeklyAnalysis")}
+                                onClick={() => onNavigate("interpret")}
+                                hoverBg={hoverBg}
+                            />
+                            <div className="h-px bg-white/5 my-2 mx-4" />
+                            <SidebarLink
+                                icon={SettingsIcon}
+                                label={t("settings")}
+                                onClick={() => onNavigate("settings")}
+                                hoverBg={hoverBg}
+                            />
                         </div>
 
                         {/* Footer / Logout */}
                         <div className="p-6 border-t border-white/5">
                             {user ? (
                                 <button
+                                    className="w-full flex items-center justify-center p-4 rounded-2xl bg-white/5 text-red-400 font-medium hover:bg-white/10 transition-colors border border-white/5 active:scale-95"
                                     onClick={handleLogout}
-                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-red-500/80 hover:text-red-500 transition-colors group"
                                 >
-                                    <LogoutIcon className="w-5 h-5" />
-                                    <span className="font-medium">{t("logout")}</span>
+                                    {t("logout")}
                                 </button>
                             ) : (
                                 <button
@@ -232,13 +173,5 @@ const SettingsIcon = ({ className }: { className?: string }) => (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <circle cx="12" cy="12" r="3" />
         <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
-    </svg>
-);
-
-const LogoutIcon = ({ className }: { className?: string }) => (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-        <polyline points="16 17 21 12 16 7" />
-        <line x1="21" y1="12" x2="9" y2="12" />
     </svg>
 );

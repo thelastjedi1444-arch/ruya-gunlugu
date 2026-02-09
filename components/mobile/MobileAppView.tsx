@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
 import { tr, enUS } from "date-fns/locale";
 import { useLanguage } from "@/hooks/use-language";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { Dream } from "@/lib/storage";
 import { BottomTabBar } from "./index";
@@ -20,8 +21,6 @@ import { DreamMood } from "./MoodSelector";
 interface MobileAppViewProps {
     dreams: Dream[];
     onNewDream: (dream: { text: string; mood?: DreamMood }) => void;
-    onDreamClick: (dream: Dream) => void;
-    onShowAuthModal: () => void;
     isListening: boolean;
     onToggleListening: () => void;
     transcript: string;
@@ -30,14 +29,13 @@ interface MobileAppViewProps {
 export default function MobileAppView({
     dreams,
     onNewDream,
-    onDreamClick,
-    onShowAuthModal,
     isListening,
     onToggleListening,
     transcript,
 }: MobileAppViewProps) {
     const { t, language, setLanguage } = useLanguage();
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
+    const router = useRouter();
     const [activeTab, setActiveTab] = useState<"calendar" | "journal" | "interpret" | "settings">("journal");
     const [showEntryView, setShowEntryView] = useState(false);
     const [selectedDream, setSelectedDream] = useState<Dream | null>(null);
@@ -166,7 +164,6 @@ export default function MobileAppView({
                                 <span className="text-[10px] text-white/40 uppercase tracking-widest font-semibold">
                                     {searchQuery ? `${filteredDreams.length} ${t("entries")}` : t("recentDreams")}
                                 </span>
-
                                 {filteredDreams.length === 0 ? (
                                     <div className="text-center py-12">
                                         <p className="text-white/30 text-sm">{t("noRecordsYet")}</p>
@@ -180,7 +177,7 @@ export default function MobileAppView({
                                                 title={dream.title || (t("untitledDream") as string)}
                                                 preview={dream.text.slice(0, 100)}
                                                 date={dream.date}
-                                                mood={dream.mood as any}
+                                                mood={dream.mood as DreamMood}
                                                 hasInterpretation={!!dream.interpretation}
                                                 onClick={() => handleDreamClick(dream)}
                                             />
@@ -234,7 +231,7 @@ export default function MobileAppView({
                                     {user?.zodiacSign && (
                                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10">
                                             <span className="text-xs text-white/70">
-                                                {(t("zodiacSigns") as any)?.[user.zodiacSign as any]?.name || user.zodiacSign}
+                                                {(t("zodiacSigns") as Record<string, { name: string }>)?.[user.zodiacSign as string]?.name || user.zodiacSign}
                                             </span>
                                         </div>
                                     )}
@@ -267,10 +264,10 @@ export default function MobileAppView({
 
                                 {/* Sign Out */}
                                 <button
-                                    className="w-full flex items-center justify-center p-4 rounded-2xl bg-white/5 text-red-400 font-medium hover:bg-white/10 transition-colors"
+                                    className="w-full flex items-center justify-center p-4 rounded-2xl bg-white/5 text-red-400 font-medium hover:bg-white/10 transition-colors border border-white/5 active:scale-95"
                                     onClick={async () => {
-                                        await fetch("/api/auth/logout", { method: "POST" });
-                                        window.location.href = "/login";
+                                        await logout();
+                                        router.push("/login");
                                     }}
                                 >
                                     {t("logout")}

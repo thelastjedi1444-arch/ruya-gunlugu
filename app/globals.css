@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #0a0a0a;
+  --color-background: #000000;
   --color-foreground: #e5e5e5;
   --color-muted: #525252;
   --color-accent: #d4d4d4;
@@ -10,7 +10,7 @@
 }
 
 :root {
-  --background: #0a0a0a;
+  --background: #000000;
   --foreground: #e5e5e5;
   /* Safe area insets for iOS */
   --safe-area-inset-top: env(safe-area-inset-top, 0px);

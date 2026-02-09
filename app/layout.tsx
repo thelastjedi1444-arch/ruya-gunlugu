@@ -32,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="tr">
-      <body className={`${inter.className} flex h-screen overflow-hidden bg-[#0a0a0a]`}>
+      <body className={`${inter.className} flex h-screen overflow-hidden bg-[#000000]`}>
         <Providers>
           <main className="flex-1 relative flex flex-col overflow-hidden w-full h-full">
             {children}

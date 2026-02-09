@@ -20,11 +20,14 @@ export default function BottomTabBar({ activeTab, onTabChange, onNewDream }: Bot
     ];
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
-            {/* Background blur + gradient - BUILD_v1.1 */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/95 to-transparent backdrop-blur-xl" />
+        <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden overflow-visible">
+            {/* Glossy top border - BUILD_v1.2 */}
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent shadow-[0_-1px_10px_rgba(255,255,255,0.05)]" />
 
-            <div className="relative flex items-end justify-between px-6 pb-[env(safe-area-inset-bottom,8px)] pt-2">
+            {/* Background: Pure black for OLED + Strong backdrop blur */}
+            <div className="absolute inset-0 bg-black/95 backdrop-blur-2xl" />
+
+            <div className="relative flex items-center justify-between px-4 pb-[env(safe-area-inset-bottom,12px)] pt-3 max-w-lg mx-auto">
                 {/* Journal */}
                 <TabButton
                     icon={tabs[0].icon}
@@ -41,16 +44,21 @@ export default function BottomTabBar({ activeTab, onTabChange, onNewDream }: Bot
                     onClick={() => onTabChange(tabs[1].id)}
                 />
 
-                {/* New Dream FAB - Center */}
-                <motion.button
-                    whileTap={{ scale: 0.9 }}
-                    onClick={onNewDream}
-                    className="relative -top-5 w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.4)] border border-white/10"
-                >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
-                        <path d="M12 5v14M5 12h14" />
-                    </svg>
-                </motion.button>
+                {/* New Dream FAB - Modern Floating Design */}
+                <div className="relative -mt-12 mb-4">
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.92 }}
+                        onClick={onNewDream}
+                        className="w-14 h-14 bg-gradient-to-br from-indigo-500 via-blue-600 to-blue-700 rounded-2xl flex items-center justify-center shadow-[0_10px_30px_rgba(37,99,235,0.4),inset_0_2px_4px_rgba(255,255,255,0.3)] border border-white/20 transform -rotate-1 relative z-10"
+                    >
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+                            <path d="M12 5v14M5 12h14" />
+                        </svg>
+                        {/* Glow effect */}
+                        <div className="absolute inset-0 rounded-2xl bg-blue-400/20 blur-xl -z-10 animate-pulse" />
+                    </motion.button>
+                </div>
 
                 {/* Interpret */}
                 <TabButton
@@ -60,8 +68,13 @@ export default function BottomTabBar({ activeTab, onTabChange, onNewDream }: Bot
                     onClick={() => onTabChange(tabs[2].id)}
                 />
 
-                {/* Empty slot for balance if needed, or just 3 tabs + FAB */}
-                <div className="w-12" />
+                {/* Settings */}
+                <TabButton
+                    icon={tabs[3].icon}
+                    label={tabs[3].label as string}
+                    isActive={activeTab === tabs[3].id}
+                    onClick={() => onTabChange(tabs[3].id)}
+                />
             </div>
         </div>
     );
@@ -82,12 +95,18 @@ function TabButton({
         <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={onClick}
-            className="flex flex-col items-center gap-1 py-2 px-2 min-w-[64px]"
+            className="flex flex-col items-center gap-1.5 py-1 px-2 min-w-[64px] relative"
         >
-            <Icon className={`w-6 h-6 transition-colors ${isActive ? "text-blue-500" : "text-white/40"}`} />
-            <span className={`text-[10px] uppercase tracking-wider font-medium transition-colors ${isActive ? "text-blue-500" : "text-white/40"}`}>
+            <Icon className={`w-6 h-6 transition-all duration-300 ${isActive ? "text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.5)]" : "text-white/30"}`} />
+            <span className={`text-[10px] uppercase tracking-widest font-bold transition-all duration-300 ${isActive ? "text-white" : "text-white/20"}`}>
                 {label}
             </span>
+            {isActive && (
+                <motion.div
+                    layoutId="tab-indicator"
+                    className="absolute -bottom-1 w-1 h-1 bg-blue-400 rounded-full shadow-[0_0_4px_rgba(96,165,250,0.8)]"
+                />
+            )}
         </motion.button>
     );
 }

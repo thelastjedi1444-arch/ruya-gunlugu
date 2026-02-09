@@ -23,10 +23,10 @@ export default function MoodSelector({ selectedMood, onSelect }: MoodSelectorPro
 
     return (
         <div className="space-y-3">
-            <span className="text-[10px] text-white/40 uppercase tracking-widest font-semibold">
+            <span className="text-xs text-white/60 uppercase tracking-widest font-bold block mb-4 mt-2">
                 {t("moodOfDream")}
             </span>
-            <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
+            <div className="grid grid-cols-5 gap-3 w-full">
                 {moods.map((mood) => {
                     const isSelected = selectedMood === mood.id;
                     const Icon = mood.icon;
@@ -35,17 +35,17 @@ export default function MoodSelector({ selectedMood, onSelect }: MoodSelectorPro
                             key={mood.id}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => onSelect(mood.id)}
-                            className="flex flex-col items-center gap-2 min-w-[64px]"
+                            className="flex flex-col items-center gap-2 w-full"
                         >
                             <motion.div
                                 animate={{
                                     backgroundColor: isSelected ? "rgba(255,255,255,1)" : "rgba(255,255,255,0.05)",
                                     scale: isSelected ? 1 : 0.95,
                                 }}
-                                className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                                className="w-full aspect-square rounded-2xl flex items-center justify-center"
                             >
                                 <Icon
-                                    className={`w-6 h-6 transition-colors ${isSelected ? "text-black" : "text-white/40"}`}
+                                    className={`w-8 h-8 transition-colors ${isSelected ? "text-black" : "text-white/40"}`}
                                     filled={isSelected}
                                 />
                             </motion.div>
