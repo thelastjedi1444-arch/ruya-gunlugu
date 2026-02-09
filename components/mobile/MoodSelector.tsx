@@ -24,7 +24,7 @@ export default function MoodSelector({ selectedMood, onSelect }: MoodSelectorPro
     return (
         <div className="space-y-3">
             <span className="text-[10px] text-white/40 uppercase tracking-widest font-semibold">
-                {t("moodOfDream") || "MOOD OF THE DREAM"}
+                {t("moodOfDream")}
             </span>
             <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
                 {moods.map((mood) => {

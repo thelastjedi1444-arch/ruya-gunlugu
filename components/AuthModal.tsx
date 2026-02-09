@@ -185,7 +185,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                             }`}>
                                             {usernameStatus === "checking" ? "..." :
                                                 usernameStatus === "available" ? t("usernameAvailable") :
-                                                    usernameStatus === "taken" ? "Bu ad alınmış" : "Sistem hatası"}
+                                                    usernameStatus === "taken" ? t("usernameTakenMessage") : t("anErrorOccurred")}
                                         </span>
                                     )}
                                 </label>
@@ -212,7 +212,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                 {mode === "register" && usernameStatus === "taken" && (
                                     <p className="text-xs text-red-400 mt-1 flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-300">
                                         <span className="inline-block w-1 h-1 rounded-full bg-red-400" />
-                                        {t("usernameTakenMessage") as string || "Bu kullanıcı adı başkası tarafından kullanılıyor. Lütfen farklı bir ad seçin."}
+                                        {t("usernameTakenMessage")}
                                     </p>
                                 )}
                             </div>
@@ -222,7 +222,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                 <label className="text-sm text-white/60 font-medium flex justify-between items-center">
                                     <span>{t("password") as string}</span>
                                     {mode === "register" && password.length >= 6 && !confirmPassword && (
-                                        <span className="text-[10px] text-white/40 uppercase tracking-wider font-bold">Lütfen teyit edin</span>
+                                        <span className="text-[10px] text-white/40 uppercase tracking-wider font-bold">{t("pleaseConfirm")}</span>
                                     )}
                                 </label>
                                 <input
@@ -269,9 +269,9 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                             {mode === "register" && (
                                 <div className="border-t border-white/5 pt-4">
                                     <div className="flex flex-col gap-1 mb-4">
-                                        <span className="text-xs text-white/40 font-medium uppercase tracking-wider">{t("zodiacSign") as string} (Opsiyonel)</span>
+                                        <span className="text-xs text-white/40 font-medium uppercase tracking-wider">{t("zodiacSign")} {t("optional")}</span>
                                         <p className="text-[10px] text-white/20 leading-tight">
-                                            {t("zodiacInstruction") as string}
+                                            {t("zodiacInstruction")}
                                         </p>
                                     </div>
                                     <div className="scale-90 md:scale-100 origin-top">

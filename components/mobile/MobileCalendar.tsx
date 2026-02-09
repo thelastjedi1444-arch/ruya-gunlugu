@@ -136,7 +136,7 @@ export default function MobileCalendar({ dreams, onDreamClick }: MobileCalendarP
                                     {format(selectedDay, "d MMMM yyyy", { locale: dateLocale })}
                                 </h3>
                                 <p className="text-xs text-white/30 truncate">
-                                    {getDreamsForDate(selectedDay).length} {t("entries") || "dreams recorded"}
+                                    {getDreamsForDate(selectedDay).length} {t("entries")}
                                 </p>
                             </div>
                             <button
@@ -166,7 +166,7 @@ export default function MobileCalendar({ dreams, onDreamClick }: MobileCalendarP
                                             </span>
                                             {dream.mood && (
                                                 <span className="text-[10px] uppercase font-bold tracking-widest text-purple-400">
-                                                    {dream.mood}
+                                                    {t(`mood${dream.mood.charAt(0).toUpperCase()}${dream.mood.slice(1)}` as any) || dream.mood}
                                                 </span>
                                             )}
                                         </div>
@@ -177,7 +177,7 @@ export default function MobileCalendar({ dreams, onDreamClick }: MobileCalendarP
                                 ))
                             ) : (
                                 <p className="text-white/30 text-center py-10 italic text-sm">
-                                    {t("noRecordsYet") || "No dreams recorded."}
+                                    {t("noRecordsYet")}
                                 </p>
                             )}
                         </div>

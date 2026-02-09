@@ -62,8 +62,9 @@ export default function DreamDetailView({ dream, onClose, onInterpret }: DreamDe
 
                 {dream.mood && (
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 mb-8">
-                        {/* You can verify mood icon here later */}
-                        <span className="text-sm text-white/70 capitalize">{dream.mood}</span>
+                        <span className="text-sm text-white/70 capitalize">
+                            {t(`mood${dream.mood.charAt(0).toUpperCase()}${dream.mood.slice(1)}` as any) || dream.mood}
+                        </span>
                     </div>
                 )}
 
@@ -80,7 +81,7 @@ export default function DreamDetailView({ dream, onClose, onInterpret }: DreamDe
                             <path d="M12 2a10 10 0 1 0 10 10H12V2z" />
                             <circle cx="12" cy="12" r="2" />
                         </svg>
-                        {t("interpretation") || "Interpretation"}
+                        {t("interpretation")}
                     </h3>
 
                     {dream.interpretation ? (
@@ -98,11 +99,11 @@ export default function DreamDetailView({ dream, onClose, onInterpret }: DreamDe
                             {isInterpreting ? (
                                 <>
                                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                    Interpreting...
+                                    {t("interpretingDream")}
                                 </>
                             ) : (
                                 <>
-                                    <span>Interpret Dream</span>
+                                    <span>{t("interpretDream")}</span>
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                         <path d="M5 12h14M12 5l7 7-7 7" />
                                     </svg>

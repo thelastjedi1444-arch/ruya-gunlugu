@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLanguage } from "@/hooks/use-language";
 
 interface MobileHeaderProps {
     title?: string;
@@ -20,6 +21,7 @@ export default function MobileHeader({
     onSave,
     saveDisabled = false,
 }: MobileHeaderProps) {
+    const { t } = useLanguage();
     const [isSearching, setIsSearching] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -48,7 +50,7 @@ export default function MobileHeader({
                         onClick={onCancel}
                         className="text-white/70 text-base font-medium px-2 py-1"
                     >
-                        Cancel
+                        {t("feedbackCancel") || "Cancel"}
                     </motion.button>
 
                     <span className="text-xs text-white/40 uppercase tracking-widest font-semibold">
@@ -64,7 +66,7 @@ export default function MobileHeader({
                             : "bg-white text-black"
                             }`}
                     >
-                        Save
+                        {t("save") || "Save"}
                     </motion.button>
                 </div>
             </header>
@@ -102,7 +104,7 @@ export default function MobileHeader({
                                 exit={{ opacity: 0, scale: 0.95, width: "80%" }}
                                 ref={inputRef}
                                 type="text"
-                                placeholder="Search dreams..."
+                                placeholder={t("tellYourDream")}
                                 onChange={(e) => onSearchClick?.(e.target.value)}
                                 className="bg-white/10 text-white text-sm px-4 py-2 rounded-full focus:outline-none focus:ring-1 focus:ring-white/30 w-full"
                             />
@@ -126,7 +128,7 @@ export default function MobileHeader({
                     className="w-10 h-10 flex items-center justify-center rounded-full active:bg-white/10 transition-colors"
                 >
                     {isSearching ? (
-                        <span className="text-white text-sm font-medium">Cancel</span>
+                        <span className="text-white text-sm font-medium">{t("feedbackCancel") || "Cancel"}</span>
                     ) : (
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <circle cx="11" cy="11" r="8" />

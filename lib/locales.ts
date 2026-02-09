@@ -23,6 +23,7 @@ export const translations = {
         analysisError: "Analiz sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
         interpretOrTellDream: "Rüyanı yorumla veya yeni bir rüya anlat...",
         joined: "Katıldı",
+        interpret: "Yorumla",
         // Sidebar
         newDream: "YENİ RÜYA YAZ",
         emptyMind: "Zihnini boşlukla buluştur",
@@ -56,6 +57,14 @@ export const translations = {
         dreamsThisMonthTitle: "BU AYIN RÜYALARI",
         entries: "Giriş",
         dreamPlaceholder: "Bir cam ormanında yürüyordum...",
+        weekly: "Haftalık",
+        monthly: "Aylık",
+        failedToAnalyze: "Analiz oluşturulamadı.",
+        recentInterpretations: "Son Yorumlar",
+        analyzingDreams: "Rüyalar analiz ediliyor...",
+        detailedMonthlyAnalysis: "Detaylı Aylık Analiz",
+        detailedMonthlyAnalysisDesc: "Bu özellik çok yakında geliyor.",
+        comingSoon: "Pek Yakında",
 
         // Calendar Page
         backToHome: "Ana Sayfaya Dön",
@@ -77,6 +86,7 @@ export const translations = {
         passwordsDoNotMatch: "Şifreler eşleşmiyor",
         userNotFound: "Kullanıcı bulunamadı",
         usernameTakenMessage: "Bu kullanıcı adı başkası tarafından kullanılıyor. Lütfen farklı bir ad seçin.",
+
         anErrorOccurred: "Bir hata oluştu",
         processing: "İşleniyor...",
         noAccount: "Hesabın yok mu? Kayıt Ol",
@@ -85,6 +95,8 @@ export const translations = {
         passwordsMatch: "Şifreler eşleşti ✅",
         loginSuccess: "Giriş başarılı! Yönlendiriliyorsunuz...",
         registerSuccess: "Kayıt başarılı! Hoş geldin ✨",
+        pleaseConfirm: "Lütfen onaylayın",
+        optional: "(İsteğe bağlı)",
 
         // Feedback
         feedbackTitle: "Geri Bildiriminiz Bizim İçin Çok Önemli!",
@@ -111,6 +123,8 @@ export const translations = {
         wordCountLabel: "KELİME",
         interpretationLabel: "YORUM",
         save: "KAYDET",
+        cancel: "İPTAL",
+        languageLabel: "DİL",
         edit: "DÜZENLE",
         profile: "PROFİL",
         registrationDate: "KAYIT TARİHİ",
@@ -156,6 +170,9 @@ export const translations = {
         analysisError: "An error occurred during analysis. Please try again later.",
         interpretOrTellDream: "Interpret your dream or tell a new one...",
         joined: "Joined",
+        interpret: "Interpret",
+
+        // Sidebar
         newDream: "WRITE NEW DREAM",
         emptyMind: "Connect your mind with space",
         expand: "EXPAND ↗",
@@ -188,6 +205,14 @@ export const translations = {
         dreamsThisMonthTitle: "DREAMS THIS MONTH",
         entries: "Entries",
         dreamPlaceholder: "I found myself walking through a forest of glass...",
+        weekly: "Weekly",
+        monthly: "Monthly",
+        failedToAnalyze: "Failed to analyze.",
+        recentInterpretations: "Recent Interpretations",
+        analyzingDreams: "Analyzing dreams...",
+        detailedMonthlyAnalysis: "Detailed Monthly Analysis",
+        detailedMonthlyAnalysisDesc: "This feature is coming soon.",
+        comingSoon: "Coming Soon",
 
         // Calendar Page
         backToHome: "Back to Home",
@@ -209,6 +234,7 @@ export const translations = {
         passwordsDoNotMatch: "Passwords do not match",
         userNotFound: "User not found",
         usernameTakenMessage: "This username is already taken. Please choose another one.",
+
         anErrorOccurred: "An error occurred",
         processing: "Processing...",
         noAccount: "Don't have an account? Register",
@@ -217,6 +243,8 @@ export const translations = {
         passwordsMatch: "Passwords match ✅",
         loginSuccess: "Login successful! Redirecting...",
         registerSuccess: "Registration successful! Welcome ✨",
+        pleaseConfirm: "Please confirm",
+        optional: "(Optional)",
 
         // Feedback
         feedbackTitle: "Your Feedback Matters to Us!",
@@ -243,6 +271,8 @@ export const translations = {
         wordCountLabel: "WORDS",
         interpretationLabel: "INTERPRETATION",
         save: "SAVE",
+        cancel: "CANCEL",
+        languageLabel: "LANGUAGE",
         edit: "EDIT",
         profile: "PROFILE",
         registrationDate: "REGISTRATION DATE",

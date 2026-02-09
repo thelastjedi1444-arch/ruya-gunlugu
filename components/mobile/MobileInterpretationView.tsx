@@ -51,10 +51,10 @@ export default function MobileInterpretationView() {
         <div className="space-y-6">
             <div className="space-y-2">
                 <h2 className="text-xl font-bold text-white px-2">
-                    {t("interpretation") || "Interpretation"}
+                    {t("interpretation")}
                 </h2>
                 <p className="text-sm text-white/40 px-2 leading-relaxed">
-                    {t("interpretOrTellDream") || "Unlock the hidden meanings of your dreams instantly, without saving."}
+                    {t("interpretOrTellDream")}
                 </p>
             </div>
 
@@ -63,7 +63,7 @@ export default function MobileInterpretationView() {
                 <textarea
                     value={text}
                     onChange={(e) => setText(e.target.value)}
-                    placeholder={t("dreamPlaceholder") || "I found myself walking through a forest of glass..."}
+                    placeholder={t("dreamPlaceholder") as string}
                     className="w-full h-40 bg-transparent text-lg text-white placeholder:text-white/20 resize-none outline-none leading-relaxed"
                 />
 
@@ -78,11 +78,11 @@ export default function MobileInterpretationView() {
                         {isLoading ? (
                             <>
                                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                <span>{t("interpretingDream") || "Interpreting..."}</span>
+                                <span>{t("interpretingDream")}</span>
                             </>
                         ) : (
                             <>
-                                <span>{t("interpretDream")?.toString().split(" ")[0] || "Interpret"}</span>
+                                <span>{t("interpretDream")?.toString().split(" ")[0]}</span>
                                 <span>✨</span>
                             </>
                         )}
@@ -100,7 +100,7 @@ export default function MobileInterpretationView() {
                     <div className={`absolute top-0 left-0 w-1 h-full ${isTr ? "bg-red-500" : "bg-blue-500"}`} />
 
                     <h3 className={`text-sm font-bold uppercase tracking-widest mb-4 ${accentColor}`}>
-                        {t("interpretation") || "INTERPRETATION"}
+                        {t("interpretation")}
                     </h3>
 
                     <div className="prose prose-invert prose-sm max-w-none text-white/80 leading-relaxed font-serif">

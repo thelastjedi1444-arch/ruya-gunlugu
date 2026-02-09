@@ -14,7 +14,7 @@ import MobileCalendar from "./MobileCalendar";
 import DreamListItem from "./DreamListItem";
 import DreamEntryView from "./DreamEntryView";
 import DreamDetailView from "./DreamDetailView";
-import MobileInterpretationView from "./MobileInterpretationView";
+import MobileAnalysisHub from "./MobileAnalysisHub";
 import { DreamMood } from "./MoodSelector";
 
 interface MobileAppViewProps {
@@ -36,9 +36,9 @@ export default function MobileAppView({
     onToggleListening,
     transcript,
 }: MobileAppViewProps) {
-    const { t, language } = useLanguage();
+    const { t, language, setLanguage } = useLanguage();
     const { user } = useAuth();
-    const [activeTab, setActiveTab] = useState<"calendar" | "journal" | "interpret">("journal");
+    const [activeTab, setActiveTab] = useState<"calendar" | "journal" | "interpret" | "settings">("journal");
     const [showEntryView, setShowEntryView] = useState(false);
     const [selectedDream, setSelectedDream] = useState<Dream | null>(null);
     const [showSidebar, setShowSidebar] = useState(false);
@@ -63,10 +63,6 @@ export default function MobileAppView({
     }, [dreams, searchQuery]);
 
     const handleNewDream = () => {
-        if (!user) {
-            onShowAuthModal();
-            return;
-        }
         setShowEntryView(true);
     };
 
@@ -201,8 +197,89 @@ export default function MobileAppView({
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 20 }}
+                            className="h-full"
                         >
-                            <MobileInterpretationView />
+                            <MobileAnalysisHub
+                                dreams={dreams}
+                                onInterpret={(text) => console.log("Interpreted:", text)}
+                                onDreamClick={handleDreamClick}
+                            />
+                        </motion.div>
+                    )}
+
+                    {activeTab === "settings" && (
+                        <motion.div
+                            key="settings"
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 20 }}
+                            className="space-y-6"
+                        >
+                            <div className="space-y-4">
+                                <h2 className="text-xl font-bold text-white px-2">
+                                    {t("settings")}
+                                </h2>
+
+                                {/* Profile Section */}
+                                <div className="bg-[#111] rounded-2xl p-6 border border-white/5">
+                                    <div className="flex items-center gap-4 mb-4">
+                                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xl font-bold text-white">
+                                            {user?.username.substring(0, 2).toUpperCase() || "G"}
+                                        </div>
+                                        <div>
+                                            <h3 className="text-white font-medium">{user?.username || "Guest"}</h3>
+                                            <p className="text-xs text-white/40">{t("joined")}: {format(new Date(user?.createdAt || Date.now()), "d MMM yyyy", { locale: dateLocale })}</p>
+                                        </div>
+                                    </div>
+                                    {user?.zodiacSign && (
+                                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10">
+                                            <span className="text-xs text-white/70">
+                                                {(t("zodiacSigns") as any)?.[user.zodiacSign as any]?.name || user.zodiacSign}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Language Settings */}
+                                <div className="bg-[#111] rounded-2xl overflow-hidden border border-white/5">
+                                    <div className="p-4 border-b border-white/5">
+                                        <h3 className="text-sm font-medium text-white/60 uppercase tracking-widest">
+                                            {t("languageLabel")}
+                                        </h3>
+                                    </div>
+                                    <div className="divide-y divide-white/5">
+                                        <button
+                                            onClick={() => setLanguage("tr")}
+                                            className="w-full flex items-center justify-between px-6 py-4 hover:bg-white/5 transition-colors"
+                                        >
+                                            <span className={`text-base ${language === "tr" ? "text-white font-medium" : "text-white/60"}`}>Türkçe</span>
+                                            {language === "tr" && <span className="text-blue-500">✓</span>}
+                                        </button>
+                                        <button
+                                            onClick={() => setLanguage("en")}
+                                            className="w-full flex items-center justify-between px-6 py-4 hover:bg-white/5 transition-colors"
+                                        >
+                                            <span className={`text-base ${language === "en" ? "text-white font-medium" : "text-white/60"}`}>English</span>
+                                            {language === "en" && <span className="text-blue-500">✓</span>}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Sign Out */}
+                                <button
+                                    className="w-full flex items-center justify-center p-4 rounded-2xl bg-white/5 text-red-400 font-medium hover:bg-white/10 transition-colors"
+                                    onClick={async () => {
+                                        await fetch("/api/auth/logout", { method: "POST" });
+                                        window.location.href = "/login";
+                                    }}
+                                >
+                                    {t("logout")}
+                                </button>
+
+                                <p className="text-center text-xs text-white/10 pt-4 font-mono uppercase tracking-[0.2em]">
+                                    iDream v1.2 • Verified Stable
+                                </p>
+                            </div>
                         </motion.div>
                     )}
                 </AnimatePresence>

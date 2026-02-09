@@ -102,7 +102,7 @@ export default function DreamEntryView({
                                         : "bg-white text-black"
                                         }`}
                                 >
-                                    {t("save") || "Save"}
+                                    {t("save")}
                                 </motion.button>
                             </div>
                         </div>
@@ -134,13 +134,13 @@ export default function DreamEntryView({
                         {/* Narrative */}
                         <div className="flex-1">
                             <span className="text-[10px] text-white/40 uppercase tracking-widest font-semibold block mb-3">
-                                {t("theNarrative") || "THE NARRATIVE"}
+                                {t("theNarrative")}
                             </span>
                             <textarea
                                 ref={textareaRef}
                                 value={text}
                                 onChange={(e) => setText(e.target.value)}
-                                placeholder={t("dreamPlaceholder") as string || "I found myself walking through a forest of glass..."}
+                                placeholder={t("dreamPlaceholder") as string}
                                 className="w-full bg-transparent text-white/80 text-lg leading-relaxed placeholder:text-white/20 resize-none focus:outline-none min-h-[200px]"
                             />
                         </div>
@@ -178,7 +178,7 @@ export default function DreamEntryView({
                                 </button>
                             </div>
                             <span className="text-xs text-white/30 uppercase tracking-wider">
-                                {wordCount} {t("words") || "WORDS"}
+                                {wordCount} {t("words")}
                             </span>
                         </div>
                     </div>
