@@ -183,7 +183,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                             usernameStatus === "available" ? "text-green-400" : "text-red-400"
                                             }`}>
                                             {usernameStatus === "checking" ? "..." :
-                                                usernameStatus === "available" ? t("usernameAvailable") : "Bu ad alınmış"}
+                                                usernameStatus === "available" ? t("usernameAvailable") :
+                                                    usernameStatus === "taken" ? "Bu ad alınmış" : "Sistem hatası"}
                                         </span>
                                     )}
                                 </label>
