@@ -65,9 +65,8 @@ export default function ZodiacWheel({ onSelect, selectedSign, t = (key) => key }
                             <span
                                 className={`text-xl md:text-2xl mb-1 ${isSelected ? "text-blue-400" : "text-white/60"}`}
                                 style={{
-                                    textShadow: "0 0 8px currentColor", // Changed to create a glow effect
-                                    // Removed color: "transparent" to make the text visible
-                                    filter: "brightness(1.5)"
+                                    textShadow: "0 0 10px rgba(59, 130, 246, 0.5)",
+                                    filter: "grayscale(100%) brightness(200%) sepia(100%) hue-rotate(180deg) saturate(300%)" // Force blue/white monochrome
                                 }}
                             >
                                 {zodiacSymbols[signKey]}
@@ -105,8 +104,8 @@ export default function ZodiacWheel({ onSelect, selectedSign, t = (key) => key }
                                 <span
                                     className="text-2xl md:text-3xl text-blue-400"
                                     style={{
-                                        textShadow: "0 0 8px #60a5fa", // Changed to create a glow effect
-                                        // Removed color: "transparent" to make the text visible
+                                        textShadow: "0 0 12px rgba(96, 165, 250, 0.6)",
+                                        filter: "grayscale(100%) brightness(200%) sepia(100%) hue-rotate(180deg) saturate(300%)"
                                     }}
                                 >
                                     {zodiacSymbols[selectedSign]}
