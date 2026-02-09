@@ -21,6 +21,8 @@ import { DreamMood } from "./MoodSelector";
 interface MobileAppViewProps {
     dreams: Dream[];
     onNewDream: (dream: { text: string; mood?: DreamMood }) => void;
+    onDreamClick: (dream: Dream) => void;
+    onShowAuthModal: () => void;
     isListening: boolean;
     onToggleListening: () => void;
     transcript: string;
@@ -29,6 +31,8 @@ interface MobileAppViewProps {
 export default function MobileAppView({
     dreams,
     onNewDream,
+    onDreamClick,
+    onShowAuthModal,
     isListening,
     onToggleListening,
     transcript,
