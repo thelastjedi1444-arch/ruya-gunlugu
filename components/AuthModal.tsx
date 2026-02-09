@@ -30,6 +30,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 setUsernameStatus("checking");
                 try {
                     const res = await fetch(`/api/auth/check-username?username=${encodeURIComponent(username.trim())}`);
+                    if (!res.ok) {
+                        setUsernameStatus("idle");
+                        return;
+                    }
                     const data = await res.json();
                     setUsernameStatus(data.available ? "available" : "taken");
                 } catch (err) {
