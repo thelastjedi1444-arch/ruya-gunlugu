@@ -21,6 +21,11 @@ export async function GET(req: Request) {
 
     } catch (error) {
         console.error('Username check error:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        return NextResponse.json({
+            error: 'Internal Server Error',
+            details: errorMessage,
+            stack: error instanceof Error ? error.stack : undefined
+        }, { status: 500 });
     }
 }
