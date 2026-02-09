@@ -11,10 +11,10 @@ const getPrisma = () => {
     }
 
     if (process.env.NODE_ENV === 'production') {
-        return new PrismaClient({ datasourceUrl: url })
+        return new PrismaClient({ datasourceUrl: url } as any)
     }
     if (!global.__prismaClient) {
-        global.__prismaClient = new PrismaClient({ datasourceUrl: url })
+        global.__prismaClient = new PrismaClient({ datasourceUrl: url } as any)
     }
     return global.__prismaClient
 }
