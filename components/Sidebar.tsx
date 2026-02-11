@@ -36,8 +36,13 @@ interface SidebarProps {
 export default function Sidebar({ isOpen, dreams, onSelectDream, onDeleteDream, currentDreamId, onWeeklyAnalysis, onDayClick, onClose }: SidebarProps) {
     const { language, t } = useLanguage();
     const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+    const [mounted, setMounted] = useState(false);
     const dateLocale = language === "tr" ? tr : enUS;
     const weekDaysShort = t("weekDaysShort") as readonly string[];
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     // Close menu on outside click
     useEffect(() => {
@@ -121,7 +126,7 @@ export default function Sidebar({ isOpen, dreams, onSelectDream, onDeleteDream, 
                                 transition={{ delay: 0.1 }}
                                 className="text-sm font-semibold text-white/80 uppercase tracking-widest"
                             >
-                                {format(today, "MMMM yyyy", { locale: dateLocale })}
+                                {mounted ? format(today, "MMMM yyyy", { locale: dateLocale }) : null}
                             </motion.span>
                             <Link href="/calendar" className="text-xs text-white/40 hover:text-white transition-colors px-2 py-1 rounded-md hover:bg-white/5">
                                 {t("expand") as string} →

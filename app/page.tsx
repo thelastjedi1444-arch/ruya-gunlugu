@@ -319,6 +319,8 @@ function DreamJournalContent() {
 
     setDreamId(newDream.id);
     setStatus("saved");
+
+    return newDream;
   };
 
   const handleInterpret = async () => {
@@ -610,10 +612,14 @@ function DreamJournalContent() {
       {/* Mobile App View - Rendered only on mobile */}
       <MobileAppView
         dreams={dreams}
-        onNewDream={(dream) => {
+        onNewDream={async (dream) => {
           if (dream.text.trim()) {
             setDream(dream.text);
-            handleSave();
+            const saved = await handleSave();
+
+            // If we have a saved dream and want to interpret (though currently handleSave doesn't take params to know intent)
+            // Ideally we'd separate save and interpret, but for now we return the dream to child.
+            return saved;
           }
         }}
         onDreamClick={(selectedDream) => {

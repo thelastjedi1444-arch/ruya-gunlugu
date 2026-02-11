@@ -34,6 +34,11 @@ export default function DreamEntryView({
     const [mood, setMood] = useState<DreamMood | undefined>(initialMood);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const dateLocale = language === "tr" ? tr : enUS;
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         if (isOpen && textareaRef.current) {
@@ -112,12 +117,12 @@ export default function DreamEntryView({
                     <div className="flex-1 overflow-y-auto pt-[calc(env(safe-area-inset-top,12px)+56px)] pb-20 px-5">
                         {/* Date Display */}
                         <div className="mb-6">
-                            <p className="text-sm text-white/70 uppercase tracking-widest font-bold mb-1 ml-1 opacity-80">
-                                {format(new Date(), "MMMM yyyy", { locale: dateLocale }).toUpperCase()}
-                            </p>
-                            <h2 className="text-2xl font-bold text-white">
-                                {format(new Date(), "EEEE, MMM d", { locale: dateLocale })}
+                            <h2 className="text-3xl font-light text-white tracking-tight">
+                                {mounted ? format(new Date(), "MMMM yyyy", { locale: dateLocale }).toUpperCase() : null}
                             </h2>
+                            <p className="text-sm text-white/40 uppercase tracking-widest mt-1 font-medium">
+                                {mounted ? format(new Date(), "EEEE, MMM d", { locale: dateLocale }) : null}
+                            </p>
                         </div>
 
                         {/* Divider */}

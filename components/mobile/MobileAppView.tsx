@@ -20,7 +20,7 @@ import { DreamMood } from "./MoodSelector";
 
 interface MobileAppViewProps {
     dreams: Dream[];
-    onNewDream: (dream: { text: string; mood?: DreamMood }) => void;
+    onNewDream: (dream: { text: string; mood?: DreamMood }) => Promise<any>;
     onDreamClick: (dream: Dream) => void;
     onShowAuthModal: () => void;
     isListening: boolean;
@@ -41,7 +41,7 @@ export default function MobileAppView({
     const { user, logout } = useAuth();
     const router = useRouter();
     const [activeTab, setActiveTab] = useState<"calendar" | "journal" | "interpret" | "settings">("journal");
-    const [showEntryView, setShowEntryView] = useState(false);
+    const [showEntryView, setShowEntryView] = useState(true); // Default to true for quick entry
     const [selectedDream, setSelectedDream] = useState<Dream | null>(null);
     const [showSidebar, setShowSidebar] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
@@ -75,9 +75,12 @@ export default function MobileAppView({
 
     const handleSaveAndInterpret = async (dream: { text: string; mood?: DreamMood }) => {
         // Save first
-        onNewDream(dream);
+        const savedDream = await onNewDream(dream); // onNewDream needs to return the saved dream
         setShowEntryView(false);
-        // User can then interpret from the detail view
+
+        if (savedDream && savedDream.id) {
+            handleInterpretDream(savedDream.id);
+        }
     };
 
     const handleDreamClick = (dream: Dream) => {

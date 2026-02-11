@@ -1,4 +1,4 @@
-import { format, parseISO, isSameDay, addDays } from "date-fns";
+import { format, parseISO, isSameDay, addDays, isValid } from "date-fns";
 // Helper to generate IDs safely across different environments (secure & non-secure contexts)
 const generateId = () => {
     try {
@@ -141,10 +141,19 @@ export const getDreams = (userId?: string | null): Dream[] => {
     const stored = localStorage.getItem(STORAGE_KEY);
     const allDreams: Dream[] = stored ? JSON.parse(stored) : [];
 
+    const validDreams = allDreams.filter(d => {
+        if (!d.date) return false;
+        try {
+            return isValid(parseISO(d.date));
+        } catch {
+            return false;
+        }
+    });
+
     if (userId) {
-        return allDreams.filter(d => d.userId === userId);
+        return validDreams.filter(d => d.userId === userId);
     }
-    return allDreams.filter(d => !d.userId);
+    return validDreams.filter(d => !d.userId);
 };
 
 export const updateDream = (id: string, updates: Partial<Dream>) => {

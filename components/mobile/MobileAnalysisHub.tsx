@@ -20,6 +20,11 @@ export default function MobileAnalysisHub({ dreams, onInterpret, onDreamClick }:
     const { t, language } = useLanguage();
     const { user } = useAuth();
     const [activeTab, setActiveTab] = useState<"interpret" | "weekly" | "monthly">("interpret");
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     return (
         <div className="flex flex-col h-full bg-black min-h-[80vh]">
@@ -241,7 +246,7 @@ function WeeklyAnalysisView({ dreams, language }: { dreams: Dream[], language: "
             <div className="bg-[#111] border border-white/5 rounded-2xl p-6 text-center">
                 <p className="text-white/40 text-xs uppercase tracking-widest mb-1">{t("weeklyAnalysis")}</p>
                 <h2 className="text-xl font-medium text-white">
-                    {format(weekStart, "d MMM", { locale: dateLocale })} - {format(weekEnd, "d MMM", { locale: dateLocale })}
+                    {mounted ? `${format(weekStart, "d MMM", { locale: dateLocale })} - ${format(weekEnd, "d MMM", { locale: dateLocale })}` : null}
                 </h2>
             </div>
 
@@ -307,7 +312,7 @@ function MonthlyAnalysisView({ dreams, language }: { dreams: Dream[], language: 
             <div className="bg-[#111] border border-white/5 rounded-2xl p-6 text-center">
                 <p className="text-white/40 text-xs uppercase tracking-widest mb-1">{t("monthly")}</p>
                 <h2 className="text-xl font-medium text-white">
-                    {format(today, "MMMM yyyy", { locale: dateLocale })}
+                    {mounted ? format(today, "MMMM yyyy", { locale: dateLocale }) : null}
                 </h2>
             </div>
 
