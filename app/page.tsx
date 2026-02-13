@@ -196,7 +196,10 @@ function DreamJournalContent() {
 
   // Check for missing Zodiac Sign
   useEffect(() => {
-    if (user && !user.zodiacSign && !hasDismissedZodiac) {
+    // Check if user has explicitly skipped
+    const skipped = typeof window !== 'undefined' ? localStorage.getItem('skip_zodiac_prompt') : null;
+
+    if (user && !user.zodiacSign && !hasDismissedZodiac && !skipped) {
       // Simple delay to not be annoying immediately on load
       const timer = setTimeout(() => setShowZodiacPrompt(true), 1500);
       return () => clearTimeout(timer);
@@ -205,12 +208,38 @@ function DreamJournalContent() {
     }
   }, [user, hasDismissedZodiac]);
 
-  const handleSaveZodiac = () => {
+  const handleSaveZodiac = async () => {
     if (promptZodiacSign && user) {
-      updateUser(user.username, { zodiacSign: promptZodiacSign });
-      // No need to set show false manually as effect will handle it, but for instant UI feedback:
-      setShowZodiacPrompt(false);
+      try {
+        // Optimistic update for UI responsiveness
+        setShowZodiacPrompt(false);
+
+        // Update via API
+        const res = await fetch('/api/auth/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ zodiacSign: promptZodiacSign }),
+        });
+
+        if (res.ok) {
+          // Force auth refresh so the new zodiac sign is reflected in useAuth
+          window.dispatchEvent(new Event("auth-change"));
+        } else {
+          console.error("Failed to update zodiac sign");
+          // If failed, maybe show prompt again next time? For now, we let it slide until reload.
+        }
+      } catch (error) {
+        console.error("Error saving zodiac:", error);
+      }
     }
+  };
+
+  const handleSkipZodiac = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('skip_zodiac_prompt', 'true');
+    }
+    setHasDismissedZodiac(true);
+    setShowZodiacPrompt(false);
   };
 
   // Load dream if ID is present
@@ -1025,11 +1054,17 @@ function DreamJournalContent() {
                   />
                 </div>
 
-                <div className="flex justify-center gap-4 mt-6">
+                <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-8">
+                  <button
+                    onClick={handleSkipZodiac}
+                    className="text-white/40 hover:text-white text-sm transition-colors order-2 md:order-1"
+                  >
+                    Seçmek İstemiyorum
+                  </button>
                   <button
                     onClick={handleSaveZodiac}
                     disabled={!promptZodiacSign}
-                    className="bg-white text-black px-8 py-2 rounded-full font-medium hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="bg-white text-black px-8 py-2 rounded-full font-medium hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors order-1 md:order-2"
                   >
                     Kaydet
                   </button>
