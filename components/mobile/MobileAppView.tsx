@@ -267,13 +267,20 @@ export default function MobileAppView({
                                             </p>
                                         </div>
                                     </div>
-                                    {user?.zodiacSign && (
-                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20">
-                                            <span className="text-sm text-indigo-300">
-                                                {(t("zodiacSigns") as Record<string, { name: string }>)?.[user.zodiacSign as string]?.name || user.zodiacSign}
-                                            </span>
-                                        </div>
-                                    )}
+                                    {(() => {
+                                        if (!user?.zodiacSign) return null;
+                                        const signs = t("zodiacSigns") as Record<string, { name: string }>;
+                                        const key = user.zodiacSign.toLowerCase();
+                                        const signName = signs?.[key]?.name;
+
+                                        return (
+                                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20">
+                                                <span className="text-sm text-indigo-300">
+                                                    {signName || user.zodiacSign}
+                                                </span>
+                                            </div>
+                                        );
+                                    })()}
                                 </div>
 
                                 {/* Stats Section */}
