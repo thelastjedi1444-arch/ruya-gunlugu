@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/hooks/use-language";
 import { useAuth } from "@/hooks/use-auth";
@@ -15,6 +15,13 @@ interface MobileAnalysisHubProps {
     onInterpret: (text: string) => void;
     onDreamClick: (dream: Dream) => void;
 }
+
+interface ChatMessage {
+    role: "user" | "assistant" | "system";
+    content: string;
+}
+
+const MAX_MESSAGES = 5;
 
 export default function MobileAnalysisHub({ dreams, onInterpret, onDreamClick }: MobileAnalysisHubProps) {
     const { t, language } = useLanguage();
@@ -51,12 +58,11 @@ export default function MobileAnalysisHub({ dreams, onInterpret, onDreamClick }:
             <div className="flex-1 overflow-y-auto px-4 pb-24">
                 <AnimatePresence mode="wait">
                     {activeTab === "interpret" && (
-                        <InterpretationView
+                        <ChatInterpretationView
                             key="interpret"
                             dreams={dreams}
                             user={user}
-                            onInterpret={onInterpret}
-                            onDreamClick={onDreamClick}
+                            language={language}
                         />
                     )}
                     {activeTab === "weekly" && (
@@ -64,6 +70,7 @@ export default function MobileAnalysisHub({ dreams, onInterpret, onDreamClick }:
                             key="weekly"
                             dreams={dreams}
                             language={language}
+                            mounted={mounted}
                         />
                     )}
                     {activeTab === "monthly" && (
@@ -71,6 +78,7 @@ export default function MobileAnalysisHub({ dreams, onInterpret, onDreamClick }:
                             key="monthly"
                             dreams={dreams}
                             language={language}
+                            mounted={mounted}
                         />
                     )}
                 </AnimatePresence>
@@ -97,132 +105,265 @@ function TabButton({ label, isActive, onClick }: { label: string, isActive: bool
     );
 }
 
-// --- Views ---
+// --- CHAT-BASED INTERPRETATION VIEW ---
 
-function InterpretationView({ dreams, user, onInterpret, onDreamClick }: { dreams: Dream[], user: any, onInterpret: (t: string) => void, onDreamClick: (d: Dream) => void }) {
-    const { t, language } = useLanguage();
-    const [text, setText] = useState("");
+function ChatInterpretationView({ dreams, user, language }: { dreams: Dream[], user: any, language: "tr" | "en" }) {
+    const { t } = useLanguage();
+    const [selectedDream, setSelectedDream] = useState<Dream | null>(null);
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [userMessageCount, setUserMessageCount] = useState(0);
+    const [inputText, setInputText] = useState("");
     const [loading, setLoading] = useState(false);
-    const [interpretation, setInterpretation] = useState("");
-    const [error, setError] = useState<string | null>(null);
+    const chatEndRef = useRef<HTMLDivElement>(null);
+    const dateLocale = language === "tr" ? tr : enUS;
 
-    // Filter dreams that have interpretations
-    const interpretedDreams = dreams.filter(d => d.interpretation);
+    // Scroll to bottom when new messages appear
+    useEffect(() => {
+        chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
 
-    const handleInterpret = async () => {
-        if (!text.trim()) return;
+    const handleSelectDream = (dream: Dream) => {
+        setSelectedDream(dream);
+        setMessages([]);
+        setUserMessageCount(0);
+        setInputText("");
+
+        // Initial AI greeting with dream context
+        const systemContext = language === "tr"
+            ? `Kullanıcının rüyası: "${dream.text}"\n\nBu rüyayı psikolojik açıdan yorumla. Sıcak, samimi ve destekleyici ol. Kullanıcıyla sohbet tarzında konuş. İlk mesajında rüyayı kısaca özetle ve ilk yorumunu yap. Sonra kullanıcının sorularını yanıtla. ${user?.zodiacSign ? `Kullanıcının burcu: ${user.zodiacSign}` : ""}`
+            : `User's dream: "${dream.text}"\n\nInterpret this dream from a psychological perspective. Be warm, friendly and supportive. Talk in a conversational style. In your first message, briefly summarize the dream and give your initial interpretation. Then answer the user's questions. ${user?.zodiacSign ? `User's zodiac sign: ${user.zodiacSign}` : ""}`;
+
+        // Send initial interpretation request
+        sendToAI(systemContext, []);
+    };
+
+    const sendToAI = async (prompt: string, currentMessages: ChatMessage[]) => {
         setLoading(true);
-        setError(null);
-        setInterpretation("");
-
         try {
-            const res = await fetch("/api/interpret", {
+            const res = await fetch("/api/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    text,
-                    language,
-                    zodiacSign: user?.zodiacSign
+                    messages: [...currentMessages, { role: "user", content: prompt }]
                 }),
             });
 
             const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Interpretation failed");
-
-            setInterpretation(data.interpretation);
+            if (data.response) {
+                const aiMessage: ChatMessage = { role: "assistant", content: data.response };
+                setMessages(prev => [...prev, aiMessage]);
+            }
         } catch (err) {
-            setError(t("failedToAnalyze") as string);
+            const errorMessage: ChatMessage = {
+                role: "assistant",
+                content: language === "tr" ? "Bir hata oluştu, tekrar dene." : "An error occurred, try again."
+            };
+            setMessages(prev => [...prev, errorMessage]);
         } finally {
             setLoading(false);
         }
     };
 
+    const handleSendMessage = async () => {
+        if (!inputText.trim() || loading || userMessageCount >= MAX_MESSAGES) return;
+
+        const userMessage: ChatMessage = { role: "user", content: inputText.trim() };
+        const newMessages = [...messages, userMessage];
+        setMessages(newMessages);
+        setUserMessageCount(prev => prev + 1);
+        setInputText("");
+
+        // Build context with dream + conversation history
+        const context = language === "tr"
+            ? `Rüya: "${selectedDream?.text}"\n\nKullanıcı ile rüya yorumu sohbetine devam et. Kısa ve öz yanıtlar ver. ${user?.zodiacSign ? `Burcu: ${user.zodiacSign}` : ""}\n\nSohbet:\n${newMessages.map(m => `${m.role === "user" ? "Kullanıcı" : "Yorumcu"}: ${m.content}`).join("\n")}`
+            : `Dream: "${selectedDream?.text}"\n\nContinue the dream interpretation chat with the user. Give concise responses. ${user?.zodiacSign ? `Zodiac: ${user.zodiacSign}` : ""}\n\nChat:\n${newMessages.map(m => `${m.role === "user" ? "User" : "Interpreter"}: ${m.content}`).join("\n")}`;
+
+        await sendToAI(context, []);
+    };
+
+    const handleBackToDreams = () => {
+        setSelectedDream(null);
+        setMessages([]);
+        setUserMessageCount(0);
+        setInputText("");
+    };
+
+    // --- DREAM LIST VIEW ---
+    if (!selectedDream) {
+        return (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
+                <h3 className="text-lg font-medium text-white/80 px-1">{t("selectDreamToInterpret")}</h3>
+
+                {dreams.length === 0 ? (
+                    <div className="text-center py-16">
+                        <div className="w-16 h-16 mx-auto bg-white/5 rounded-full flex items-center justify-center mb-4">
+                            <span className="text-2xl">🌙</span>
+                        </div>
+                        <p className="text-white/30 text-sm">{t("noDreamsYet")}</p>
+                    </div>
+                ) : (
+                    <div className="space-y-3">
+                        {dreams.map(dream => {
+                            const hasInterpretation = !!dream.interpretation;
+                            return (
+                                <motion.button
+                                    key={dream.id}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={() => handleSelectDream(dream)}
+                                    className="w-full bg-[#111] border border-white/5 rounded-2xl p-4 flex items-start gap-4 hover:bg-white/[0.06] transition-all text-left group active:bg-white/10"
+                                >
+                                    <div className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-transform group-hover:scale-110 ${hasInterpretation ? "bg-green-500/10" : "bg-indigo-500/10"}`}>
+                                        <span className="text-lg">{hasInterpretation ? "✅" : "🌙"}</span>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <span className="text-white font-medium truncate pr-2">
+                                                {dream.title || t("untitledDream")}
+                                            </span>
+                                            <span className="text-[10px] text-white/30 flex-shrink-0">
+                                                {format(parseISO(dream.date), "d MMM", { locale: dateLocale })}
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-white/40 line-clamp-2">{dream.text.slice(0, 120)}</p>
+                                        <div className="mt-2">
+                                            <span className={`text-[9px] uppercase tracking-widest font-bold ${hasInterpretation ? "text-green-400/60" : "text-white/20"}`}>
+                                                {hasInterpretation ? t("interpreted") : t("noInterpretationYet")}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </motion.button>
+                            );
+                        })}
+                    </div>
+                )}
+            </motion.div>
+        );
+    }
+
+    // --- CHAT VIEW ---
     return (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
-            {/* Input Section */}
-            <div className="space-y-4">
-                <h3 className="text-lg font-medium text-white/80 px-1">{t("whisperQuestion")}</h3>
-                <div className="relative">
-                    <textarea
-                        value={text}
-                        onChange={(e) => setText(e.target.value)}
-                        placeholder={t("tellYourDream") as string}
-                        className="w-full bg-[#111] border border-white/10 rounded-2xl p-4 text-white placeholder:text-white/20 min-h-[120px] focus:outline-none focus:border-white/20 transition-colors resize-none"
-                    />
-                    <button
-                        disabled={!text.trim() || loading}
-                        onClick={handleInterpret}
-                        className={`absolute bottom-4 right-4 p-2 rounded-full transition-all ${text.trim() && !loading ? "bg-white text-black shadow-lg shadow-white/20" : "bg-[#222] text-white/20 cursor-not-allowed"}`}
-                    >
-                        {loading ? (
-                            <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                        ) : (
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-                        )}
-                    </button>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="flex flex-col h-[calc(100vh-220px)]">
+            {/* Chat Header */}
+            <div className="flex items-center gap-3 mb-4">
+                <button
+                    onClick={handleBackToDreams}
+                    className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+                >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+                </button>
+                <div className="flex-1 min-w-0">
+                    <h3 className="text-white font-medium text-sm truncate">{t("chatWithAI")}</h3>
+                    <p className="text-[10px] text-white/30 truncate">{selectedDream.title || t("untitledDream")}</p>
+                </div>
+                <div className="px-2 py-1 bg-white/5 rounded-full">
+                    <span className="text-[10px] text-white/40 font-bold">
+                        {MAX_MESSAGES - userMessageCount} {t("messagesLeft")}
+                    </span>
                 </div>
             </div>
 
-            {/* Result */}
-            <AnimatePresence>
-                {interpretation && (
-                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 border border-indigo-500/20 rounded-2xl p-6 overflow-hidden">
-                        <div className="flex items-center gap-2 mb-3 text-indigo-300 text-xs font-bold uppercase tracking-widest">
-                            <span>✨</span>
-                            <span>{t("interpretation")}</span>
+            {/* Dream Summary Card */}
+            <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-xl p-3 mb-4">
+                <span className="text-[9px] text-indigo-300/60 uppercase tracking-widest font-bold">{t("dreamSummary")}</span>
+                <p className="text-xs text-white/50 line-clamp-2 mt-1">{selectedDream.text.slice(0, 150)}...</p>
+            </div>
+
+            {/* Chat Messages */}
+            <div className="flex-1 overflow-y-auto space-y-3 mb-4">
+                {messages.map((msg, i) => (
+                    <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                    >
+                        <div className={`max-w-[85%] rounded-2xl px-4 py-3 ${msg.role === "user"
+                            ? "bg-blue-600 text-white rounded-br-md"
+                            : "bg-[#1a1a1a] border border-white/5 text-white/80 rounded-bl-md"
+                            }`}
+                        >
+                            {msg.role === "assistant" ? (
+                                <div className="prose prose-invert prose-sm max-w-none text-sm leading-relaxed">
+                                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                                </div>
+                            ) : (
+                                <p className="text-sm">{msg.content}</p>
+                            )}
                         </div>
-                        <div className="prose prose-invert prose-sm max-w-none text-gray-300 leading-relaxed">
-                            <ReactMarkdown>{interpretation}</ReactMarkdown>
+                    </motion.div>
+                ))}
+
+                {loading && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
+                        <div className="bg-[#1a1a1a] border border-white/5 rounded-2xl rounded-bl-md px-4 py-3">
+                            <div className="flex items-center gap-2">
+                                <div className="flex gap-1">
+                                    <div className="w-2 h-2 bg-white/30 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                                    <div className="w-2 h-2 bg-white/30 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                                    <div className="w-2 h-2 bg-white/30 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                                </div>
+                                <span className="text-xs text-white/30">{t("interpretingNow")}</span>
+                            </div>
                         </div>
                     </motion.div>
                 )}
-            </AnimatePresence>
 
-            {/* Previous Interpretations List */}
-            {interpretedDreams.length > 0 && (
-                <div className="space-y-4 pt-4 border-t border-white/5">
-                    <h3 className="text-sm font-semibold text-white/40 uppercase tracking-widest px-1">
-                        {t("recentInterpretations")}
-                    </h3>
-                    <div className="grid gap-3">
-                        {interpretedDreams.slice(0, 5).map(dream => (
-                            <button
-                                key={dream.id}
-                                onClick={() => onDreamClick(dream)}
-                                className="w-full bg-[#111] border border-white/5 rounded-xl p-4 flex items-start gap-4 hover:bg-white/5 transition-all text-left group"
-                            >
-                                <div className="shrink-0 w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
-                                    <span className="text-lg">🌙</span>
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex items-center justify-between mb-1">
-                                        <span className="text-white font-medium truncate pr-2">{dream.title || t("untitledDream")}</span>
-                                        <span className="text-[10px] text-white/30">{format(parseISO(dream.date), "d MMM", { locale: language === "tr" ? tr : enUS })}</span>
-                                    </div>
-                                    <p className="text-xs text-white/40 line-clamp-2">{dream.interpretation}</p>
-                                </div>
-                            </button>
-                        ))}
-                    </div>
+                <div ref={chatEndRef} />
+            </div>
+
+            {/* Chat Input */}
+            {userMessageCount >= MAX_MESSAGES ? (
+                <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 text-center">
+                    <p className="text-amber-300 text-sm">{t("chatLimitReached")}</p>
+                    <button
+                        onClick={handleBackToDreams}
+                        className="mt-2 px-4 py-2 bg-white/10 rounded-lg text-white text-sm hover:bg-white/15 transition-colors"
+                    >
+                        {t("backToDreams")}
+                    </button>
+                </div>
+            ) : (
+                <div className="flex items-center gap-2 bg-[#111] border border-white/10 rounded-xl p-2">
+                    <input
+                        type="text"
+                        value={inputText}
+                        onChange={(e) => setInputText(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                        placeholder={t("typeMessage") as string}
+                        className="flex-1 bg-transparent text-white text-sm placeholder:text-white/20 focus:outline-none px-2"
+                        disabled={loading}
+                    />
+                    <button
+                        disabled={!inputText.trim() || loading}
+                        onClick={handleSendMessage}
+                        className={`p-2 rounded-lg transition-all ${inputText.trim() && !loading
+                            ? "bg-blue-600 text-white"
+                            : "bg-white/5 text-white/20"
+                            }`}
+                    >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+                        </svg>
+                    </button>
                 </div>
             )}
         </motion.div>
     );
 }
 
-function WeeklyAnalysisView({ dreams, language }: { dreams: Dream[], language: "tr" | "en" }) {
+
+// --- WEEKLY ---
+
+function WeeklyAnalysisView({ dreams, language, mounted }: { dreams: Dream[], language: "tr" | "en", mounted: boolean }) {
     const { t } = useLanguage();
     const [analysis, setAnalysis] = useState("");
     const [loading, setLoading] = useState(true);
 
-    // Date Calcs
     const today = new Date();
     const dateLocale = language === "tr" ? tr : enUS;
     const weekStart = startOfWeek(today, { weekStartsOn: 1 });
     const weekEnd = endOfWeek(today, { weekStartsOn: 1 });
     const weekDays = eachDayOfInterval({ start: weekStart, end: weekEnd });
-
-    // Filter this week's dreams
     const weeklyDreams = dreams.filter(d => isWithinInterval(parseISO(d.date), { start: weekStart, end: weekEnd }));
 
     useEffect(() => {
@@ -242,7 +383,6 @@ function WeeklyAnalysisView({ dreams, language }: { dreams: Dream[], language: "
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
-            {/* Header */}
             <div className="bg-[#111] border border-white/5 rounded-2xl p-6 text-center">
                 <p className="text-white/40 text-xs uppercase tracking-widest mb-1">{t("weeklyAnalysis")}</p>
                 <h2 className="text-xl font-medium text-white">
@@ -250,7 +390,6 @@ function WeeklyAnalysisView({ dreams, language }: { dreams: Dream[], language: "
                 </h2>
             </div>
 
-            {/* Timeline */}
             <div className="grid grid-cols-7 gap-2">
                 {weekDays.map((day, i) => {
                     const hasDream = weeklyDreams.some(d => isSameDay(parseISO(d.date), day));
@@ -267,7 +406,6 @@ function WeeklyAnalysisView({ dreams, language }: { dreams: Dream[], language: "
                 })}
             </div>
 
-            {/* Stats */}
             <div className="grid grid-cols-2 gap-3">
                 <div className="bg-[#111] border border-white/5 rounded-2xl p-5 flex flex-col items-center">
                     <span className="text-3xl font-light text-white mb-1">{weeklyDreams.length}</span>
@@ -281,7 +419,6 @@ function WeeklyAnalysisView({ dreams, language }: { dreams: Dream[], language: "
                 </div>
             </div>
 
-            {/* AI Analysis */}
             <div className="bg-[#111] border border-white/5 rounded-2xl p-6 min-h-[200px]">
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-10 space-y-4">
@@ -298,8 +435,9 @@ function WeeklyAnalysisView({ dreams, language }: { dreams: Dream[], language: "
     );
 }
 
-function MonthlyAnalysisView({ dreams, language }: { dreams: Dream[], language: "tr" | "en" }) {
-    // Placeholder logic for Monthly - reusing logic for now but scoped to Month
+// --- MONTHLY ---
+
+function MonthlyAnalysisView({ dreams, language, mounted }: { dreams: Dream[], language: "tr" | "en", mounted: boolean }) {
     const { t } = useLanguage();
     const today = new Date();
     const dateLocale = language === "tr" ? tr : enUS;

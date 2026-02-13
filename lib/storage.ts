@@ -47,7 +47,12 @@ export interface Feedback {
 export const getUsers = (): User[] => {
     if (typeof window === "undefined") return [];
     const stored = localStorage.getItem(USERS_KEY);
-    return stored ? JSON.parse(stored) : [];
+    try {
+        return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+        console.error("Failed to parse users:", e);
+        return [];
+    }
 };
 
 export const registerUser = (username: string, zodiacSign?: string): User => {
@@ -139,7 +144,15 @@ export const saveDream = async (text: string, userId?: string, username?: string
 export const getDreams = (userId?: string | null): Dream[] => {
     if (typeof window === "undefined") return [];
     const stored = localStorage.getItem(STORAGE_KEY);
-    const allDreams: Dream[] = stored ? JSON.parse(stored) : [];
+    let allDreams: Dream[] = [];
+    try {
+        allDreams = stored ? JSON.parse(stored) : [];
+    } catch (e) {
+        console.error("Failed to parse dreams:", e);
+        // If data is corrupted, we might want to clear it or back it up, 
+        // but for now, returning empty is safer than crashing.
+        allDreams = [];
+    }
 
     const validDreams = allDreams.filter(d => {
         if (!d.date) return false;
@@ -250,7 +263,11 @@ export const getStorageStats = (userId?: string | null) => {
 export const getFeedbacks = (): Feedback[] => {
     if (typeof window === "undefined") return [];
     const stored = localStorage.getItem(FEEDBACK_KEY);
-    return stored ? JSON.parse(stored) : [];
+    try {
+        return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+        return [];
+    }
 };
 
 export const saveFeedback = (message: string, email?: string, userId?: string, username?: string): Feedback => {

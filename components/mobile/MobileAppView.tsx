@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { format } from "date-fns";
+import { format, parseISO, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
 import { tr, enUS } from "date-fns/locale";
 import { useLanguage } from "@/hooks/use-language";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
-import { Dream } from "@/lib/storage";
+import { Dream, calculateStreak } from "@/lib/storage";
 import { BottomTabBar } from "./index";
 import MobileHeader from "./MobileHeader";
 import MobileSidebar from "./MobileSidebar";
@@ -41,11 +41,16 @@ export default function MobileAppView({
     const { user, logout } = useAuth();
     const router = useRouter();
     const [activeTab, setActiveTab] = useState<"calendar" | "journal" | "interpret" | "settings">("journal");
-    const [showEntryView, setShowEntryView] = useState(true); // Default to true for quick entry
+    const [showEntryView, setShowEntryView] = useState(true); // Opens on app launch
     const [selectedDream, setSelectedDream] = useState<Dream | null>(null);
     const [showSidebar, setShowSidebar] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [mounted, setMounted] = useState(false);
     const dateLocale = language === "tr" ? tr : enUS;
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     // Filter dreams for selected date or current month
     const filteredDreams = useMemo(() => {
@@ -64,6 +69,32 @@ export default function MobileAppView({
         );
     }, [dreams, searchQuery]);
 
+    // Stats calculations
+    const stats = useMemo(() => {
+        const now = new Date();
+        const weekStart = startOfWeek(now, { weekStartsOn: 1 });
+        const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
+        const monthStart = startOfMonth(now);
+        const monthEnd = endOfMonth(now);
+
+        const thisWeek = dreams.filter(d => {
+            try { return isWithinInterval(parseISO(d.date), { start: weekStart, end: weekEnd }); }
+            catch { return false; }
+        });
+
+        const thisMonth = dreams.filter(d => {
+            try { return isWithinInterval(parseISO(d.date), { start: monthStart, end: monthEnd }); }
+            catch { return false; }
+        });
+
+        const totalWords = dreams.reduce((acc, d) => acc + d.text.split(" ").length, 0);
+        const avgLength = dreams.length > 0 ? Math.round(totalWords / dreams.length) : 0;
+        const streak = calculateStreak(user?.id);
+        const interpreted = dreams.filter(d => d.interpretation).length;
+
+        return { thisWeek: thisWeek.length, thisMonth: thisMonth.length, totalWords, avgLength, streak, total: dreams.length, interpreted };
+    }, [dreams, user]);
+
     const handleNewDream = () => {
         setShowEntryView(true);
     };
@@ -74,8 +105,7 @@ export default function MobileAppView({
     };
 
     const handleSaveAndInterpret = async (dream: { text: string; mood?: DreamMood }) => {
-        // Save first
-        const savedDream = await onNewDream(dream); // onNewDream needs to return the saved dream
+        const savedDream = await onNewDream(dream);
         setShowEntryView(false);
 
         if (savedDream && savedDream.id) {
@@ -104,10 +134,9 @@ export default function MobileAppView({
 
             if (response.ok) {
                 const data = await response.json();
-                // Persist locally
                 const storage = await import("@/lib/storage");
                 storage.updateDream(dreamId, { interpretation: data.interpretation });
-                window.dispatchEvent(new Event("dream-saved")); // Trigger refresh in parent
+                window.dispatchEvent(new Event("dream-saved"));
             }
         } catch (error) {
             console.error("Interpretation failed", error);
@@ -227,21 +256,68 @@ export default function MobileAppView({
                                 {/* Profile Section */}
                                 <div className="bg-[#111] rounded-2xl p-6 border border-white/5">
                                     <div className="flex items-center gap-4 mb-4">
-                                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xl font-bold text-white">
+                                        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xl font-bold text-white shadow-lg shadow-blue-500/20">
                                             {user?.username.substring(0, 2).toUpperCase() || "G"}
                                         </div>
                                         <div>
-                                            <h3 className="text-white font-medium">{user?.username || "Guest"}</h3>
-                                            <p className="text-xs text-white/40">{t("joined")}: {format(new Date(user?.createdAt || Date.now()), "d MMM yyyy", { locale: dateLocale })}</p>
+                                            <h3 className="text-white font-medium text-lg">{user?.username || "Guest"}</h3>
+                                            <p className="text-xs text-white/40">
+                                                {t("joined")}: {mounted ? format(new Date(user?.createdAt || Date.now()), "d MMM yyyy", { locale: dateLocale }) : null}
+                                            </p>
                                         </div>
                                     </div>
                                     {user?.zodiacSign && (
-                                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10">
-                                            <span className="text-xs text-white/70">
+                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20">
+                                            <span className="text-sm text-indigo-300">
                                                 {(t("zodiacSigns") as Record<string, { name: string }>)?.[user.zodiacSign as string]?.name || user.zodiacSign}
                                             </span>
                                         </div>
                                     )}
+                                </div>
+
+                                {/* Stats Section */}
+                                <div className="space-y-3">
+                                    <h3 className="text-[10px] text-white/40 uppercase tracking-widest font-semibold px-2">
+                                        {t("yourStats")}
+                                    </h3>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <StatCard
+                                            value={stats.thisWeek}
+                                            label={t("thisWeekDreams") as string}
+                                            sublabel={t("dreamsLabel") as string}
+                                            icon="📅"
+                                        />
+                                        <StatCard
+                                            value={stats.thisMonth}
+                                            label={t("thisMonthDreams") as string}
+                                            sublabel={t("dreamsLabel") as string}
+                                            icon="📆"
+                                        />
+                                        <StatCard
+                                            value={stats.total}
+                                            label={t("totalDreamsCount") as string}
+                                            sublabel={t("dreamsLabel") as string}
+                                            icon="🌙"
+                                        />
+                                        <StatCard
+                                            value={stats.streak}
+                                            label={t("streakDays") as string}
+                                            sublabel={t("daysLabel") as string}
+                                            icon="🔥"
+                                        />
+                                        <StatCard
+                                            value={stats.totalWords}
+                                            label={t("totalWords") as string}
+                                            sublabel={t("wordsLabel") as string}
+                                            icon="✍️"
+                                        />
+                                        <StatCard
+                                            value={stats.interpreted}
+                                            label={t("interpretation") as string}
+                                            sublabel={t("dreamsLabel") as string}
+                                            icon="✨"
+                                        />
+                                    </div>
                                 </div>
 
                                 {/* Language Settings */}
@@ -281,7 +357,7 @@ export default function MobileAppView({
                                 </button>
 
                                 <p className="text-center text-xs text-white/10 pt-4 font-mono uppercase tracking-[0.2em]">
-                                    iDream v1.2 • Verified Stable
+                                    iDream v2.0 • Production Ready
                                 </p>
                             </div>
                         </motion.div>
@@ -296,7 +372,7 @@ export default function MobileAppView({
                 onNewDream={handleNewDream}
             />
 
-            {/* Entry View Modal */}
+            {/* Entry View Modal - Opens on app launch */}
             <DreamEntryView
                 isOpen={showEntryView}
                 onClose={() => setShowEntryView(false)}
@@ -317,6 +393,17 @@ export default function MobileAppView({
                     />
                 )}
             </AnimatePresence>
+        </div>
+    );
+}
+
+// Stat Card Component
+function StatCard({ value, label, sublabel, icon }: { value: number, label: string, sublabel: string, icon: string }) {
+    return (
+        <div className="bg-[#111] border border-white/5 rounded-2xl p-4 flex flex-col items-center text-center">
+            <span className="text-lg mb-1">{icon}</span>
+            <span className="text-2xl font-light text-white">{value}</span>
+            <span className="text-[10px] text-white/30 uppercase tracking-widest mt-1">{label}</span>
         </div>
     );
 }

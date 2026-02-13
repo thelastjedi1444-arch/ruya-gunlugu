@@ -66,6 +66,32 @@ export const translations = {
         detailedMonthlyAnalysisDesc: "Bu özellik çok yakında geliyor.",
         comingSoon: "Pek Yakında",
 
+        // Chat Interpretation
+        selectDreamToInterpret: "Yorumlamak istediğin rüyayı seç",
+        noDreamsYet: "Henüz rüya kaydın yok. Bir rüya yaz ve yorumlamaya başla!",
+        startChat: "Sohbeti Başlat",
+        chatWithAI: "Rüya Yorumcusu",
+        typeMessage: "Bir soru sor...",
+        chatLimit: "5 mesaj hakkın var",
+        chatLimitReached: "Mesaj limitine ulaştın. Yeni bir rüya seçebilirsin.",
+        messagesLeft: "mesaj kaldı",
+        backToDreams: "Rüyalara Dön",
+        interpretingNow: "Yorumlanıyor...",
+        dreamSummary: "Rüya Özeti",
+        noInterpretationYet: "Henüz yorumlanmamış",
+        interpreted: "Yorumlandı",
+
+        // Settings Stats
+        thisWeekDreams: "Bu Hafta",
+        thisMonthDreams: "Bu Ay",
+        totalWords: "Toplam Kelime",
+        longestStreak: "En Uzun Seri",
+        avgDreamLength: "Ort. Uzunluk",
+        yourStats: "İSTATİSTİKLERİN",
+        dreamsLabel: "rüya",
+        wordsLabel: "kelime",
+        daysLabel: "gün",
+
         // Calendar Page
         backToHome: "Ana Sayfaya Dön",
         noDreamsForDay: "Bu gün için henüz rüya kaydı yok.",
@@ -213,6 +239,32 @@ export const translations = {
         detailedMonthlyAnalysis: "Detailed Monthly Analysis",
         detailedMonthlyAnalysisDesc: "This feature is coming soon.",
         comingSoon: "Coming Soon",
+
+        // Chat Interpretation
+        selectDreamToInterpret: "Select a dream to interpret",
+        noDreamsYet: "No dreams yet. Write a dream and start interpreting!",
+        startChat: "Start Chat",
+        chatWithAI: "Dream Interpreter",
+        typeMessage: "Ask a question...",
+        chatLimit: "You have 5 messages",
+        chatLimitReached: "Message limit reached. You can select a new dream.",
+        messagesLeft: "messages left",
+        backToDreams: "Back to Dreams",
+        interpretingNow: "Interpreting...",
+        dreamSummary: "Dream Summary",
+        noInterpretationYet: "Not yet interpreted",
+        interpreted: "Interpreted",
+
+        // Settings Stats
+        thisWeekDreams: "This Week",
+        thisMonthDreams: "This Month",
+        totalWords: "Total Words",
+        longestStreak: "Longest Streak",
+        avgDreamLength: "Avg. Length",
+        yourStats: "YOUR STATS",
+        dreamsLabel: "dreams",
+        wordsLabel: "words",
+        daysLabel: "days",
 
         // Calendar Page
         backToHome: "Back to Home",
