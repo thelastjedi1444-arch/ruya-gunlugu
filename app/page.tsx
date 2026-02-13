@@ -147,10 +147,44 @@ function DreamJournalContent() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Load dreams
+  // Load dreams from API and sync local dreams if any
   const loadDreams = async () => {
     if (user) {
       try {
+        // 1. First, check if there are any local dreams that need to be synced
+        const localDreams = getDreams(undefined); // Get all local dreams
+        const userLocalDreams = localDreams.filter(d => !d.userId || d.userId === user.id);
+
+        if (userLocalDreams.length > 0) {
+          console.log("Syncing local dreams to database...", userLocalDreams.length);
+
+          // Upload each local dream to the server
+          const syncPromises = userLocalDreams.map(async (localDream) => {
+            try {
+              const res = await fetch('/api/dreams', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  text: localDream.text,
+                  date: localDream.date,
+                  title: localDream.title,
+                  interpretation: localDream.interpretation
+                })
+              });
+              if (res.ok) {
+                // If successfully uploaded, remove from local storage
+                deleteDreamStorage(localDream.id);
+              }
+            } catch (err) {
+              console.error("Failed to sync dream:", localDream.id, err);
+            }
+          });
+
+          await Promise.all(syncPromises);
+          console.log("Sync complete");
+        }
+
+        // 2. Fetch all dreams from API (now including the synced ones)
         const res = await fetch('/api/dreams');
         if (res.ok) {
           const data = await res.json();
