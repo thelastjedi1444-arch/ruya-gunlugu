@@ -56,6 +56,18 @@ export const translations = {
         words: "KELİME",
         dreamsThisMonthTitle: "BU AYIN RÜYALARI",
         entries: "Giriş",
+
+        // Welcome Modal
+        welcomeNewVersionTitle: "Yeni Deneyime Hoş Geldin!",
+        welcomeNewVersionDesc: "iDream artık çok daha akıllı ve kişisel. Rüya yolculuğunda sana rehberlik edecek yeni özellikleri keşfet.",
+        featureChatTitle: "Sohbetli Rüya Yorumu",
+        featureChatDesc: "Rüyalarını seç ve yapay zeka ile karşılıklı konuşarak derinlemesine analiz et.",
+        featureStatsTitle: "Kişisel İstatistikler",
+        featureStatsDesc: "Haftalık ve aylık rüya takiplerini, kelime sayılarını ve serilerini gör.",
+        featureFastTitle: "Hızlı Başlangıç",
+        featureFastDesc: "Uygulamayı açtığın anda rüyanı yazmaya başla.",
+        startExploring: "Keşfetmeye Başla",
+
         dreamPlaceholder: "Bir cam ormanında yürüyordum...",
         weekly: "Haftalık",
         monthly: "Aylık",
@@ -230,6 +242,18 @@ export const translations = {
         words: "WORDS",
         dreamsThisMonthTitle: "DREAMS THIS MONTH",
         entries: "Entries",
+
+        // Welcome Modal
+        welcomeNewVersionTitle: "Welcome to the New Experience!",
+        welcomeNewVersionDesc: "iDream is now smarter and more personal. Discover new features to guide your dream journey.",
+        featureChatTitle: "Chat Interpretation",
+        featureChatDesc: "Select dreams and analyze them in depth by chatting with AI.",
+        featureStatsTitle: "Personal Stats",
+        featureStatsDesc: "Track your weekly and monthly dreams, word counts, and streaks.",
+        featureFastTitle: "Quick Start",
+        featureFastDesc: "Start writing your dream the moment you open the app.",
+        startExploring: "Start Exploring",
+
         dreamPlaceholder: "I found myself walking through a forest of glass...",
         weekly: "Weekly",
         monthly: "Monthly",

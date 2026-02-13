@@ -17,6 +17,7 @@ import DreamEntryView from "./DreamEntryView";
 import DreamDetailView from "./DreamDetailView";
 import MobileAnalysisHub from "./MobileAnalysisHub";
 import { DreamMood } from "./MoodSelector";
+import NewVersionModal from "./NewVersionModal";
 
 interface MobileAppViewProps {
     dreams: Dream[];
@@ -364,6 +365,8 @@ export default function MobileAppView({
                     )}
                 </AnimatePresence>
             </main>
+
+            <NewVersionModal />
 
             {/* Bottom Tab Bar */}
             <BottomTabBar
