@@ -1020,6 +1020,7 @@ function DreamJournalContent() {
                   <ZodiacWheel
                     selectedSign={promptZodiacSign}
                     onSelect={setPromptZodiacSign}
+                    t={t}
                   />
                 </div>
 

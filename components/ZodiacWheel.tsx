@@ -31,7 +31,13 @@ interface ZodiacWheelProps {
 
 export default function ZodiacWheel({ onSelect, selectedSign, t = (key) => key }: ZodiacWheelProps) {
     const localizedZodiacSigns = t("zodiacSigns") as any;
-    const currentSignData = selectedSign ? localizedZodiacSigns[selectedSign] : undefined;
+
+    // Safety check: ensure we have an object, not a string (default t) or undefined
+    if (!localizedZodiacSigns || typeof localizedZodiacSigns !== 'object') {
+        return null;
+    }
+
+    const currentSignData = selectedSign ? localizedZodiacSigns?.[selectedSign] : undefined;
 
     return (
         <div className="w-full space-y-6">
@@ -45,7 +51,9 @@ export default function ZodiacWheel({ onSelect, selectedSign, t = (key) => key }
             {/* Grid Selection */}
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 md:gap-3">
                 {zodiacSignKeys.map((signKey) => {
-                    const sign = localizedZodiacSigns[signKey];
+                    const sign = localizedZodiacSigns?.[signKey];
+                    if (!sign) return null;
+
                     const isSelected = selectedSign === signKey;
                     return (
                         <motion.button
