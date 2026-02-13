@@ -148,9 +148,21 @@ function DreamJournalContent() {
   }, []);
 
   // Load dreams
-  const loadDreams = () => {
-    // Filter by current user ID if logged in, or show guest dreams if not
-    setDreams(getDreams(user?.id));
+  const loadDreams = async () => {
+    if (user) {
+      try {
+        const res = await fetch('/api/dreams');
+        if (res.ok) {
+          const data = await res.json();
+          setDreams(data);
+        }
+      } catch (error) {
+        console.error("Failed to load dreams from API:", error);
+      }
+    } else {
+      // Show guest dreams if not logged in
+      setDreams(getDreams(undefined));
+    }
   };
 
   useEffect(() => {
@@ -300,16 +312,52 @@ function DreamJournalContent() {
       setStatus("idle");
 
       setStatus("saving");
-      // Removed artificial delay
-      // await new Promise(resolve => setTimeout(resolve, 600));
-
       await new Promise(resolve => setTimeout(resolve, 600));
 
-      const newDream = await saveDream(text, user?.id, user?.username, language);
+      let newDream: any;
+      if (user) {
+        try {
+          const res = await fetch('/api/dreams', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text, date: new Date().toISOString() }),
+          });
 
-      // Navigate to the new dream's ID
+          if (!res.ok) throw new Error("Failed to save dream");
+          newDream = await res.json();
+
+          // Generate title asynchronously
+          fetch('/api/generate-title', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text, language }),
+          })
+            .then(res => res.json())
+            .then(data => {
+              if (data.title) {
+                fetch(`/api/dreams/${newDream.id}`, {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ title: data.title }),
+                }).then(() => {
+                  // Reload to show title
+                  loadDreams();
+                });
+              }
+            })
+            .catch(err => console.error("Title generation failed:", err));
+
+        } catch (e) {
+          console.error(e);
+          // Fallback? Or show error?
+          setStatus("idle");
+          return;
+        }
+      } else {
+        newDream = await saveDream(text, undefined, undefined, language);
+      }
+
       handleSelectDream(newDream.id);
-
       setDream("");
       setActiveDreamText(text);
 
@@ -327,17 +375,48 @@ function DreamJournalContent() {
     const currentText = dream;
     setStatus("saving");
 
-    // Remove artificial delay to fix "lag"/double-glitch feel
-    // await new Promise(resolve => setTimeout(resolve, 600));
+    let newDream: any;
+    if (user) {
+      try {
+        const res = await fetch('/api/dreams', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: currentText, date: new Date().toISOString() }),
+        });
 
-    // await new Promise(resolve => setTimeout(resolve, 600));
+        if (!res.ok) throw new Error("Failed to save dream");
+        newDream = await res.json();
 
-    const newDream = await saveDream(currentText, user?.id, user?.username, language);
+        // Generate title asynchronously
+        fetch('/api/generate-title', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: currentText, language }),
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.title) {
+              fetch(`/api/dreams/${newDream.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: data.title }),
+              }).then(() => {
+                loadDreams();
+              });
+            }
+          })
+          .catch(err => console.error("Title generation failed:", err));
 
+      } catch (e) {
+        console.error(e);
+        setStatus("idle");
+        return;
+      }
+    } else {
+      newDream = await saveDream(currentText, undefined, undefined, language);
+    }
 
-    // Navigate to the new dream's ID to prevent useEffect from resetting the state
     handleSelectDream(newDream.id);
-
     setDream("");
     setActiveDreamText(currentText);
 

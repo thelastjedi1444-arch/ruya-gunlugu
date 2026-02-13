@@ -128,7 +128,7 @@ export default function MobileCalendar({ dreams, onDreamClick }: MobileCalendarP
                         initial={{ opacity: 0, y: "100%" }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: "100%" }}
-                        className="absolute bottom-[20px] left-4 right-4 bg-[#1A1A1A] border border-white/10 rounded-3xl shadow-2xl p-5 z-[50] max-h-[50vh] overflow-y-auto"
+                        className="fixed bottom-0 left-0 right-0 p-4 z-[101] bg-[#1A1A1A] border-t border-white/10 rounded-t-3xl shadow-2xl max-h-[60vh] overflow-y-auto"
                     >
                         <div className="flex items-center justify-between mb-5 border-b border-white/5 pb-3">
                             <div>
