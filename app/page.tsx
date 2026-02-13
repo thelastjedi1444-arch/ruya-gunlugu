@@ -22,6 +22,7 @@ import UserProfileModal from "@/components/UserProfileModal";
 import { deleteDream as deleteDreamStorage, updateUser } from "@/lib/storage";
 import ZodiacWheel from "@/components/ZodiacWheel";
 import { MobileAppView } from "@/components/mobile";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 function DreamJournalContent() {
   useEffect(() => {
@@ -1044,8 +1045,10 @@ function DreamJournalContent() {
 
 export default function Home() {
   return (
-    <Suspense fallback={<div className="text-center text-muted font-light tracking-widest pt-20">Ruhun Yükleniyor...</div>}>
-      <DreamJournalContent />
-    </Suspense>
+    <ErrorBoundary>
+      <Suspense fallback={<div className="text-center text-muted font-light tracking-widest pt-20">Ruhun Yükleniyor...</div>}>
+        <DreamJournalContent />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
