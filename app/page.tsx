@@ -192,6 +192,8 @@ function DreamJournalContent() {
         }
       } catch (error) {
         console.error("Failed to load dreams from API:", error);
+        // Fallback to local storage if API fails
+        setDreams(getDreams(user?.id));
       }
     } else {
       // Show guest dreams if not logged in
@@ -382,10 +384,16 @@ function DreamJournalContent() {
             .catch(err => console.error("Title generation failed:", err));
 
         } catch (e) {
-          console.error(e);
-          // Fallback? Or show error?
-          setStatus("idle");
-          return;
+          console.error("API Error, falling back to local:", e);
+          // Fallback to Local Storage
+          try {
+            newDream = await saveDream(text, user?.id, user?.username, language);
+            alert(language === 'tr' ? "Bağlantı sorunu, rüya telefona kaydedildi." : "Connection issue, dream saved locally.");
+          } catch (localErr) {
+            console.error("Local save failed:", localErr);
+            setStatus("idle");
+            return;
+          }
         }
       } else {
         newDream = await saveDream(text, undefined, undefined, language);
@@ -442,9 +450,16 @@ function DreamJournalContent() {
           .catch(err => console.error("Title generation failed:", err));
 
       } catch (e) {
-        console.error(e);
-        setStatus("idle");
-        return;
+        console.error("API Error, falling back to local:", e);
+        // Fallback to Local Storage
+        try {
+          newDream = await saveDream(currentText, user?.id, user?.username, language);
+          alert(language === 'tr' ? "Bağlantı sorunu, rüya telefona kaydedildi." : "Connection issue, dream saved locally.");
+        } catch (localErr) {
+          console.error("Local save failed:", localErr);
+          setStatus("idle");
+          return;
+        }
       }
     } else {
       newDream = await saveDream(currentText, undefined, undefined, language);
